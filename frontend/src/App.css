@@ -1,34 +1,195 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Restaurateur Pro - Main App Styles */
+
+/* Landing page hero */
+.hero-gradient {
+    background: radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 50%);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Button hover effects */
+.btn-primary {
+    @apply bg-zinc-100 text-zinc-900 font-medium px-6 py-2.5 rounded-md;
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.btn-primary:hover {
+    @apply bg-zinc-200;
+    transform: scale(1.02);
 }
 
-.App-link {
-    color: #61dafb;
+.btn-primary:active {
+    transform: scale(0.98);
 }
 
-@keyframes App-logo-spin {
+.btn-secondary {
+    @apply bg-zinc-800 text-zinc-100 font-medium px-6 py-2.5 rounded-md border border-zinc-700;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+    @apply bg-zinc-700 border-zinc-600;
+}
+
+/* Card styles */
+.card-dark {
+    @apply bg-[#18181b] border border-zinc-800/50 rounded-lg;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.card-dark:hover {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Tab navigation */
+.tab-nav {
+    @apply flex gap-1 p-1 bg-zinc-900/50 rounded-lg;
+}
+
+.tab-nav-item {
+    @apply px-4 py-2 text-sm font-medium text-zinc-400 rounded-md;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab-nav-item:hover {
+    @apply text-zinc-200 bg-zinc-800/50;
+}
+
+.tab-nav-item.active {
+    @apply text-zinc-100 bg-zinc-800;
+}
+
+/* Input focus styles */
+.input-dark {
+    @apply bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-md px-4 py-2;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-dark:focus {
+    @apply border-zinc-600 outline-none;
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+}
+
+.input-dark::placeholder {
+    @apply text-zinc-500;
+}
+
+/* Table styles */
+.table-dark th {
+    @apply text-xs font-bold uppercase tracking-wider text-zinc-500 py-3 px-4 text-left;
+}
+
+.table-dark td {
+    @apply py-3 px-4 text-sm text-zinc-300 border-t border-zinc-800/50;
+}
+
+.table-dark tbody tr:hover {
+    @apply bg-zinc-800/30;
+}
+
+/* Notification badge */
+.notification-badge {
+    @apply absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center text-white font-medium;
+}
+
+/* Avatar styles */
+.avatar-gradient-purple {
+    background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+}
+
+.avatar-gradient-cyan {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+
+.avatar-gradient-amber {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.avatar-gradient-emerald {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+/* Stats card */
+.stat-card {
+    @apply p-4 rounded-lg bg-zinc-800/30 border border-zinc-800/50;
+}
+
+.stat-value {
+    @apply text-2xl font-bold text-zinc-100 font-heading;
+}
+
+.stat-label {
+    @apply text-xs uppercase tracking-wider text-zinc-500 mt-1;
+}
+
+.stat-trend {
+    @apply text-xs font-medium;
+}
+
+.stat-trend.positive {
+    @apply text-green-500;
+}
+
+.stat-trend.negative {
+    @apply text-red-500;
+}
+
+/* Loading skeleton */
+.skeleton {
+    @apply bg-zinc-800 rounded animate-pulse;
+}
+
+/* Tooltip */
+.tooltip-content {
+    @apply bg-zinc-800 text-zinc-200 text-xs px-2 py-1 rounded shadow-lg border border-zinc-700;
+}
+
+/* Dropdown menu */
+.dropdown-content {
+    @apply bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden;
+}
+
+.dropdown-item {
+    @apply px-4 py-2 text-sm text-zinc-300 cursor-pointer;
+    transition: background-color 0.15s ease;
+}
+
+.dropdown-item:hover {
+    @apply bg-zinc-800 text-zinc-100;
+}
+
+/* Animations */
+@keyframes fadeInUp {
     from {
-        transform: rotate(0deg);
+        opacity: 0;
+        transform: translateY(20px);
     }
     to {
-        transform: rotate(360deg);
+        opacity: 1;
+        transform: translateY(0);
     }
 }
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Staggered animations */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
