@@ -59,6 +59,8 @@ const styles = {
   navTab: (active) => ({
     padding: "0 0.75rem",
     height: "64px",
+    flexShrink: 0,
+    whiteSpace: "nowrap",
     fontSize: "0.7rem",
     fontWeight: 500,
     letterSpacing: "0.08em",
@@ -657,11 +659,14 @@ export default function Marketeer() {
 
   return (
     <div style={styles.page}>
+      {/* Load Space Grotesk (headlines) — Inter is already global in index.css */}
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');`}</style>
+
       {/* Top App Bar */}
       <header style={styles.topbar}>
         <span style={{ fontSize: "1.25rem", color: C.primary }}>🔒</span>
         <span style={styles.brand}>MARKETEER</span>
-        <nav style={{ display: "flex", alignItems: "stretch", flex: 1, height: "64px" }}>
+        <nav style={{ display: "flex", alignItems: "stretch", flex: 1, height: "64px", overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none" }}>
           {TABS.map((tab) => (
             <button
               key={tab.id}

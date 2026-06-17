@@ -91,6 +91,8 @@
     .tab-panel.active { display: block; }
     .nav-tab { position: relative; padding: 0 4px; }
     .nav-tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #4cd6ff; }
+    .tabular-numbers { font-variant-numeric: tabular-nums; }
+    @media (prefers-reduced-motion: reduce) { .ticker { animation: none; } }
   </style>
 </head>
 
@@ -305,9 +307,9 @@
 
         <!-- Scenario Type Toggles -->
         <div class="flex gap-2 mb-4">
-          <button class="px-3 py-1.5 rounded-sm bg-primary text-on-primary text-[11px] font-medium">Social</button>
-          <button class="px-3 py-1.5 rounded-sm bg-surface-container-high text-on-surface-variant text-[11px] hover:bg-surface-container-highest transition-colors">Email</button>
-          <button class="px-3 py-1.5 rounded-sm bg-surface-container-high text-on-surface-variant text-[11px] hover:bg-surface-container-highest transition-colors">SMS</button>
+          <button onclick="setContentType('social', this)" class="content-toggle px-3 py-1.5 rounded-sm bg-primary text-on-primary text-[11px] font-medium transition-colors">Social</button>
+          <button onclick="setContentType('email', this)" class="content-toggle px-3 py-1.5 rounded-sm bg-surface-container-high text-on-surface-variant text-[11px] font-medium hover:bg-surface-container-highest transition-colors">Email</button>
+          <button onclick="setContentType('sms', this)" class="content-toggle px-3 py-1.5 rounded-sm bg-surface-container-high text-on-surface-variant text-[11px] font-medium hover:bg-surface-container-highest transition-colors">SMS</button>
         </div>
 
         <!-- AI Content Generation Card -->
@@ -317,9 +319,7 @@
               <span class="material-symbols-outlined text-primary text-base">auto_awesome</span>
               <p class="text-[10px] uppercase tracking-widest text-outline">AI-Suggested Post</p>
             </div>
-            <p class="text-sm text-on-surface leading-relaxed mb-4">
-              "🍹 Your Friday just got better. Happy Hour starts NOW — half-price cocktails and shareable plates until 7 PM. No reservations needed. Bring the crew. #HappyHour #RestaurantLife #FridayVibes"
-            </p>
+            <p id="ai-post-text" class="text-sm text-on-surface leading-relaxed mb-4" style="white-space: pre-line;">"🍹 Your Friday just got better. Happy Hour starts NOW — half-price cocktails and shareable plates until 7 PM. No reservations needed. Bring the crew. #HappyHour #RestaurantLife #FridayVibes"</p>
             <div class="flex items-center gap-3 mb-4">
               <p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Platforms:</p>
               <div class="flex gap-2">
@@ -775,7 +775,7 @@
   </nav>
 
   <!-- DEPLOY CAMPAIGN FAB -->
-  <button class="fixed bottom-20 md:bottom-6 right-4 z-50 electric-gradient text-[#001f28] font-bold text-[11px] uppercase tracking-wider px-4 py-3 rounded-sm flex items-center gap-2 shadow-lg">
+  <button onclick="switchTab('campaign')" aria-label="Deploy a new campaign" class="fixed bottom-20 md:bottom-6 right-4 z-50 electric-gradient text-[#001f28] font-bold text-[11px] uppercase tracking-wider px-4 py-3 rounded-sm flex items-center gap-2 shadow-lg hover:opacity-90 transition-opacity">
     <span class="material-symbols-outlined text-base">rocket_launch</span>
     Deploy Campaign
   </button>
@@ -803,6 +803,26 @@
           btn.classList.add('text-on-surface-variant');
         }
       });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Content Studio: swap the AI-suggested copy per channel
+    const CONTENT_COPY = {
+      social: '"🍹 Your Friday just got better. Happy Hour starts NOW — half-price cocktails and shareable plates until 7 PM. No reservations needed. Bring the crew. #HappyHour #RestaurantLife #FridayVibes"',
+      email: 'Subject: Your table is calling 🍷\n\nHi {{first_name}},\n\nThis Friday we’re pouring half-price cocktails from 4–7 PM with a fresh small-plates menu. Reply to reserve your spot — or just walk in, we’ll take care of the rest.\n\nSee you soon,\nThe Team',
+      sms: '🍹 Happy Hour is ON today at [Restaurant] — half-price cocktails ’til 7 PM. Show this text for a free starter. Reply STOP to opt out.'
+    };
+
+    function setContentType(type, btn) {
+      const target = document.getElementById('ai-post-text');
+      if (target && CONTENT_COPY[type]) target.textContent = CONTENT_COPY[type];
+      document.querySelectorAll('.content-toggle').forEach(b => {
+        b.classList.remove('bg-primary', 'text-on-primary');
+        b.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+      });
+      btn.classList.add('bg-primary', 'text-on-primary');
+      btn.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
     }
   </script>
 
