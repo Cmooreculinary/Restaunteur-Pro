@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketeer — Restaurant Marketing Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-highest": "#333539",
+            "surface-container-high": "#282a2e",
+            "surface-container": "#1e2024",
+            "surface-container-low": "#1a1c20",
+            "surface-container-lowest": "#0c0e12",
+            "surface": "#111318",
+            "surface-dim": "#111318",
+            "surface-bright": "#37393e",
+            "surface-variant": "#333539",
+            "surface-tint": "#4cd6ff",
+            "primary": "#4cd6ff",
+            "primary-container": "#007995",
+            "primary-fixed": "#b7eaff",
+            "primary-fixed-dim": "#4cd6ff",
+            "on-primary": "#003543",
+            "on-primary-fixed": "#001f28",
+            "on-primary-fixed-variant": "#004e60",
+            "on-primary-container": "#e5f7ff",
+            "secondary": "#d1bcff",
+            "secondary-container": "#7000ff",
+            "secondary-fixed": "#e9ddff",
+            "secondary-fixed-dim": "#d1bcff",
+            "on-secondary": "#3c0090",
+            "on-secondary-fixed": "#23005b",
+            "on-secondary-fixed-variant": "#5700c9",
+            "on-secondary-container": "#ddcdff",
+            "tertiary": "#00dce5",
+            "tertiary-container": "#007c81",
+            "tertiary-fixed": "#63f7ff",
+            "tertiary-fixed-dim": "#00dce5",
+            "on-tertiary": "#003739",
+            "on-tertiary-fixed": "#002021",
+            "on-tertiary-fixed-variant": "#004f53",
+            "on-tertiary-container": "#d0fcff",
+            "background": "#111318",
+            "on-background": "#e2e2e8",
+            "on-surface": "#e2e2e8",
+            "on-surface-variant": "#c2c6d9",
+            "outline": "#8c90a2",
+            "outline-variant": "#424656",
+            "error": "#ffb4ab",
+            "error-container": "#93000a",
+            "on-error": "#690005",
+            "on-error-container": "#ffdad6",
+            "inverse-surface": "#e2e2e8",
+            "inverse-on-surface": "#2f3035",
+            "inverse-primary": "#00677f"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          },
+          borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+        },
+      },
+    }
+  </script>
+  <style>
+    .glass-panel { background: rgba(51, 53, 57, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(140, 144, 162, 0.1); }
+    .electric-gradient { background: linear-gradient(135deg, #4cd6ff 0%, #7000ff 100%); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .ticker-wrap { overflow: hidden; white-space: nowrap; }
+    .ticker { display: inline-block; animation: marquee 40s linear infinite; }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    body { min-height: max(884px, 100dvh); }
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+    .nav-tab { position: relative; cursor: pointer; }
+    .nav-tab.active { color: #4cd6ff; }
+    .nav-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #4cd6ff; }
+    .bar-segment { transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .sparkline { stroke: #4cd6ff; fill: none; stroke-width: 1.5; }
+    .sparkline-area { fill: rgba(76, 214, 255, 0.1); }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body min-h-screen">
+
+  <!-- TopAppBar -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-surface h-16 border-b border-outline-variant/20 flex items-center px-4 gap-4">
+    <span class="material-symbols-outlined text-primary text-xl">lock</span>
+    <span class="font-headline text-lg font-semibold tracking-widest text-on-surface uppercase">Marketeer</span>
+    <nav class="hidden md:flex items-center gap-0 ml-6 h-full">
+      <button onclick="switchTab('campaign')" class="nav-tab active px-4 h-full text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" data-tab="campaign">Campaign</button>
+      <button onclick="switchTab('content')" class="nav-tab px-4 h-full text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" data-tab="content">Content</button>
+      <button onclick="switchTab('promotions')" class="nav-tab px-4 h-full text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" data-tab="promotions">Promotions</button>
+      <button onclick="switchTab('analytics')" class="nav-tab px-4 h-full text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" data-tab="analytics">Analytics</button>
+      <button onclick="switchTab('audience')" class="nav-tab px-4 h-full text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors" data-tab="audience">Audience</button>
+    </nav>
+    <div class="ml-auto flex items-center gap-3">
+      <span class="px-2 py-0.5 bg-primary-container/20 backdrop-blur-md border border-primary/30 rounded-full text-[9px] uppercase font-bold tracking-tighter text-primary">Live</span>
+      <div class="w-8 h-8 rounded-full electric-gradient flex items-center justify-center text-xs font-bold text-white">CM</div>
+    </div>
+  </header>
+
+  <!-- Live Ticker -->
+  <div class="fixed top-16 left-0 right-0 z-40 bg-surface-container-lowest border-b border-outline-variant/20 py-1.5 ticker-wrap">
+    <div class="ticker text-[11px] text-on-surface-variant font-medium">
+      <span class="inline-flex items-center gap-6 px-6">
+        <span><span class="text-primary">◆</span> New Review Posted: 4.8⭐ on Google — 2m ago</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-tertiary">◆</span> Happy Hour Campaign: 142 redemptions today</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-secondary">◆</span> Instagram Post Reach: +2,400 impressions</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-primary">◆</span> Email Blast Open Rate: 34.2% — above average</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-tertiary">◆</span> Loyalty Program: 68% repeat visit rate this week</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-secondary">◆</span> Weekend Brunch Push: 8,200 reached — Scaling</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-primary">◆</span> New Review Posted: 4.8⭐ on Google — 2m ago</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-tertiary">◆</span> Happy Hour Campaign: 142 redemptions today</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-secondary">◆</span> Instagram Post Reach: +2,400 impressions</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-primary">◆</span> Email Blast Open Rate: 34.2% — above average</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-tertiary">◆</span> Loyalty Program: 68% repeat visit rate this week</span>
+        <span class="text-outline-variant">|</span>
+        <span><span class="text-secondary">◆</span> Weekend Brunch Push: 8,200 reached — Scaling</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="pt-[7.5rem] pb-20 md:pb-8 px-4 max-w-7xl mx-auto">
+
+    <!-- ═══════════════════════════════════════════ CAMPAIGN TAB ═══════════ -->
+    <div id="tab-campaign" class="tab-page active">
+
+      <!-- Hero Row -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 mb-4">
+        <!-- Total Reach Hero -->
+        <div class="md:col-span-2 p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-5">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-[11px] uppercase tracking-widest text-outline font-medium mb-1">Total Campaign Reach</p>
+                <p class="font-headline text-4xl font-bold text-on-surface tabular-numbers">48.2K</p>
+                <p class="text-xs text-on-surface-variant mt-0.5">reached this month</p>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <span class="px-2 py-0.5 bg-primary-container/20 backdrop-blur-md border border-primary/30 rounded-full text-[9px] uppercase font-bold tracking-tighter text-primary">+18.4%</span>
+                <span class="text-[10px] text-outline">vs last month</span>
+              </div>
+            </div>
+            <!-- Sparkline -->
+            <svg viewBox="0 0 300 60" class="w-full h-14" preserveAspectRatio="none">
+              <polyline class="sparkline-area" points="0,60 0,42 30,38 60,35 90,30 120,28 150,32 180,22 210,18 240,12 270,8 300,5 300,60" fill="rgba(76,214,255,0.1)" stroke="none"/>
+              <polyline class="sparkline" points="0,42 30,38 60,35 90,30 120,28 150,32 180,22 210,18 240,12 270,8 300,5"/>
+              <circle cx="300" cy="5" r="3" fill="#4cd6ff"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Stat Cards -->
+        <div class="flex flex-col gap-3">
+          <div class="p-1 rounded-sm bg-surface-container-high flex-1">
+            <div class="bg-surface-container rounded-sm p-4 h-full flex flex-col justify-between">
+              <div>
+                <p class="text-[10px] uppercase tracking-widest text-outline font-medium mb-2">Active Campaigns</p>
+                <p class="font-headline text-3xl font-bold text-on-surface tabular-numbers">5</p>
+                <p class="text-[11px] text-on-surface-variant mt-1">2 High-Impact · 3 Seasonal</p>
+              </div>
+              <div class="w-full h-1 bg-surface-container-lowest rounded-full overflow-hidden mt-3">
+                <div class="bar-segment h-full rounded-full electric-gradient" style="width:83%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="p-1 rounded-sm bg-surface-container-high flex-1">
+            <div class="bg-surface-container rounded-sm p-4 h-full flex flex-col justify-between">
+              <div>
+                <p class="text-[10px] uppercase tracking-widest text-outline font-medium mb-2">Avg. Engagement Rate</p>
+                <p class="font-headline text-3xl font-bold text-on-surface tabular-numbers">6.8%</p>
+                <p class="text-[11px] text-on-surface-variant mt-1">+1.2% above industry avg</p>
+              </div>
+              <div class="w-full h-1 bg-surface-container-lowest rounded-full overflow-hidden mt-3">
+                <div class="bar-segment h-full rounded-full" style="width:68%; background:#00dce5"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Campaigns Grid -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-headline text-xl font-medium tracking-tight text-on-surface">Active Campaigns</h2>
+          <button class="flex items-center gap-1.5 text-[11px] text-primary hover:text-primary/80 transition-colors font-medium">
+            <span class="material-symbols-outlined text-base">add</span>New Campaign
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Campaign Card 1 -->
+          <div class="p-1 rounded-sm bg-surface-container-high group hover:bg-surface-container-highest transition-all duration-300">
+            <div class="bg-surface-container rounded-sm p-4 flex flex-col gap-3">
+              <div class="flex items-start justify-between">
+                <div class="w-9 h-9 rounded-sm electric-gradient flex items-center justify-center">
+                  <span class="material-symbols-outlined text-white text-base">local_bar</span>
+                </div>
+                <span class="px-2 py-0.5 bg-primary-container/20 backdrop-blur-md border border-primary/30 rounded-full text-[9px] uppercase font-bold tracking-tighter text-primary">Live</span>
+              </div>
+              <div>
+                <p class="font-headline text-sm font-semibold text-on-surface">Happy Hour Special</p>
+                <p class="text-[10px] text-outline mt-0.5 uppercase tracking-wider">High Performance</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Revenue</p>
+                  <p class="font-headline text-base font-bold text-on-surface tabular-numbers">$2.4K</p>
+                </div>
+                <div>
+                  <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Redemptions</p>
+                  <p class="font-headline text-base font-bold text-on-surface tabular-numbers">142</p>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[10px] mb-1">
+                  <span class="text-on-surface-variant">Performance</span>
+                  <span class="text-primary font-medium">94%</span>
+                </div>
+                <div class="w-full h-1 bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div class="bar-segment h-full rounded-full electric-gradient" style="width:94%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Campaign Card 2 -->
+          <div class="p-1 rounded-sm bg-surface-container-high group hover:bg-surface-container-highest transition-all duration-300">
+            <div class="bg-surface-container rounded-sm p-4 flex flex-col gap-3">
+              <div class="flex items-start justify-between">
+                <div class="w-9 h-9 rounded-sm flex items-center justify-center" style="background: rgba(0,220,229,0.15)">
+                  <span class="material-symbols-outlined text-base" style="color:#00dce5">brunch_dining</span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-tighter" style="background:rgba(0,220,229,0.1); border: 1px solid rgba(0,220,229,0.3); color:#00dce5">Scaling</span>
+              </div>
+              <div>
+                <p class="font-headline text-sm font-semibold text-on-surface">Weekend Brunch Push</p>
+                <p class="text-[10px] text-outline mt-0.5 uppercase tracking-wider">Social · Paid</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Reach</p>
+                  <p class="font-headline text-base font-bold text-on-surface tabular-numbers">8.2K</p>
+                </div>
+                <div>
+                  <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Click Rate</p>
+                  <p class="font-headline text-base font-bold text-on-surface tabular-numbers">3.2%</p>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[10px] mb-1">
+                  <span class="text-on-surface-variant">Performance</span>
+                  <span class="font-medium" style="color:#00dce5">82%</span>
+                </div>
+                <div class="w-full h-1 bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div class="bar-segment h-full rounded-full" style="width:82%; background:#00dce5"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Campaign Card 3 -->
+          <div class="p-1 rounded-sm bg-surface-container-high group hover:bg-surface-container-highest transition-all duration-300">
+            <div class="bg-surface-container rounded-sm p-4 flex flex-col gap-3">
+              <div class="flex items-start justify-between">
+                <div class="w-9 h-9 rounded-sm flex items-center justify-center" style="background: rgba(209,188,255,0.15)">
+                  <span class="material-symbols-outlined text-base" style="color:#d1bcff">loyalty</span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-tighter" style="background:rgba(209,188,255,0.1); border: 1px solid rgba(209,188,255,0.3); color:#d1bcff">Established</span>
+              </div>
+              <div>
+                <p class="font-headline text-sm font-semibold text-on-surface">Loyalty Rewards</p>
+                <p class="text-[10px] text-outline mt-0.5 uppercase tracking-wider">Email · SMS</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Members</p>
+                  <p class="font-headline text-base font-bold text-on-surface tabular-numbers">1.4K</p>
+                </div>
+                <div>
+                  <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Repeat Visits</p>
+                  <p class="font-headline text-base font-bold text-on-surface tabular-numbers">68%</p>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[10px] mb-1">
+                  <span class="text-on-surface-variant">Performance</span>
+                  <span class="font-medium" style="color:#d1bcff">68%</span>
+                </div>
+                <div class="w-full h-1 bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div class="bar-segment h-full rounded-full" style="width:68%; background:#d1bcff"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Intelligence Feed -->
+      <div class="p-1 rounded-sm bg-surface-container-high mb-4">
+        <div class="bg-surface-container rounded-sm">
+          <div class="flex items-center justify-between p-4 border-b border-outline-variant/20">
+            <h2 class="font-headline text-base font-medium tracking-tight text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-lg">bolt</span>
+              Intelligence Feed
+            </h2>
+            <span class="px-2 py-0.5 bg-primary-container/20 border border-primary/30 rounded-full text-[9px] uppercase font-bold tracking-tighter text-primary">Live</span>
+          </div>
+          <div class="divide-y divide-outline-variant/10">
+            <div class="flex items-start gap-4 p-3 hover:bg-surface-container-high transition-colors border-l-2 border-primary">
+              <span class="material-symbols-outlined text-primary text-base mt-0.5">trending_up</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-on-surface font-medium">Instagram Post Reached 2,400 New Users</p>
+                <p class="text-[11px] text-outline mt-0.5">Weekend Brunch Push · Organic reach up 31%</p>
+              </div>
+              <span class="text-[10px] text-outline whitespace-nowrap">2m ago</span>
+            </div>
+            <div class="flex items-start gap-4 p-3 hover:bg-surface-container-high transition-colors border-l-2 border-tertiary">
+              <span class="material-symbols-outlined text-tertiary text-base mt-0.5">local_bar</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-on-surface font-medium">Happy Hour redemptions up 12% this week</p>
+                <p class="text-[11px] text-outline mt-0.5">142 total today · Revenue $2,400</p>
+              </div>
+              <span class="text-[10px] text-outline whitespace-nowrap">15m ago</span>
+            </div>
+            <div class="flex items-start gap-4 p-3 hover:bg-surface-container-high transition-colors border-l-2 border-secondary-container">
+              <span class="material-symbols-outlined text-secondary text-base mt-0.5">star</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-on-surface font-medium">New 5-star review posted on Yelp</p>
+                <p class="text-[11px] text-outline mt-0.5">"Best brunch spot in the area — the staff is amazing!" — @foodie_jane</p>
+              </div>
+              <span class="text-[10px] text-outline whitespace-nowrap">1h ago</span>
+            </div>
+            <div class="flex items-start gap-4 p-3 hover:bg-surface-container-high transition-colors border-l-2 border-outline-variant/50">
+              <span class="material-symbols-outlined text-on-surface-variant text-base mt-0.5">email</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-on-surface font-medium">Email Blast: 34.2% open rate achieved</p>
+                <p class="text-[11px] text-outline mt-0.5">2,840 opened · 4.6% above industry benchmark</p>
+              </div>
+              <span class="text-[10px] text-outline whitespace-nowrap">3h ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ CONTENT TAB ═══════════ -->
+    <div id="tab-content" class="tab-page">
+      <div class="mt-4 mb-4 flex items-center justify-between">
+        <div>
+          <h1 class="font-headline text-2xl font-semibold text-on-surface">Content Studio</h1>
+          <p class="text-sm text-outline mt-0.5">AI-powered content generation for your restaurant</p>
+        </div>
+        <span class="px-3 py-1 bg-primary-container/20 border border-primary/30 rounded-full text-[11px] uppercase font-bold tracking-tighter text-primary flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">auto_awesome</span>AI Confidence: 96.4%
+        </span>
+      </div>
+
+      <!-- Content Type Selector -->
+      <div class="flex gap-2 mb-4">
+        <button onclick="setContentType(this,'social')" class="content-type-btn px-4 py-2 text-sm font-medium rounded-sm bg-primary text-on-primary">Social</button>
+        <button onclick="setContentType(this,'email')" class="content-type-btn px-4 py-2 text-sm font-medium rounded-sm bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors">Email</button>
+        <button onclick="setContentType(this,'sms')" class="content-type-btn px-4 py-2 text-sm font-medium rounded-sm bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors">SMS</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <!-- Content Generator -->
+        <div class="md:col-span-2 p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="material-symbols-outlined text-primary text-lg">edit_note</span>
+              <p class="font-headline text-sm font-medium text-on-surface">AI-Generated Post</p>
+            </div>
+            <div class="bg-surface-container-lowest rounded-sm p-4 mb-4 border border-outline-variant/20">
+              <p class="text-sm text-on-surface leading-relaxed">✨ Weekend vibes are calling! Join us for our famous Sunday Brunch featuring bottomless mimosas, farm-fresh eggs Benedict, and our signature avocado toast. 🥑🥂</p>
+              <br/>
+              <p class="text-sm text-on-surface leading-relaxed">Tag a friend you'd bring along and get a complimentary dessert on your next visit! 🍮</p>
+              <br/>
+              <p class="text-sm text-on-surface-variant">#SundayBrunch #WeekendVibes #FoodieLife #BrunchGoals #RestaurantLife</p>
+            </div>
+            <div class="flex gap-2">
+              <button class="flex-1 px-4 py-2 electric-gradient text-white text-sm font-medium rounded-sm flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-base">send</span>Publish Now
+              </button>
+              <button class="px-4 py-2 bg-surface-container-high text-on-surface-variant text-sm font-medium rounded-sm flex items-center gap-2 hover:bg-surface-container-highest transition-colors">
+                <span class="material-symbols-outlined text-base">schedule</span>Schedule
+              </button>
+              <button class="px-4 py-2 bg-surface-container-high text-on-surface-variant text-sm font-medium rounded-sm flex items-center gap-2 hover:bg-surface-container-highest transition-colors">
+                <span class="material-symbols-outlined text-base">refresh</span>Regenerate
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Platform Targeting -->
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4">
+            <p class="font-headline text-sm font-medium text-on-surface mb-3">Platform Targeting</p>
+            <div class="flex flex-col gap-2">
+              <label class="flex items-center gap-3 p-2 rounded-sm hover:bg-surface-container-high transition-colors cursor-pointer">
+                <input type="checkbox" checked class="accent-[#4cd6ff]"/>
+                <span class="material-symbols-outlined text-lg" style="color:#E1306C">photo_camera</span>
+                <span class="text-sm text-on-surface">Instagram</span>
+                <span class="ml-auto text-[10px] text-outline">+2.4K reach</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 rounded-sm hover:bg-surface-container-high transition-colors cursor-pointer">
+                <input type="checkbox" checked class="accent-[#4cd6ff]"/>
+                <span class="material-symbols-outlined text-lg" style="color:#4267B2">thumb_up</span>
+                <span class="text-sm text-on-surface">Facebook</span>
+                <span class="ml-auto text-[10px] text-outline">+1.8K reach</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 rounded-sm hover:bg-surface-container-high transition-colors cursor-pointer">
+                <input type="checkbox" class="accent-[#4cd6ff]"/>
+                <span class="material-symbols-outlined text-lg" style="color:#4cd6ff">search</span>
+                <span class="text-sm text-on-surface">Google Posts</span>
+                <span class="ml-auto text-[10px] text-outline">+890 views</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 rounded-sm hover:bg-surface-container-high transition-colors cursor-pointer">
+                <input type="checkbox" class="accent-[#4cd6ff]"/>
+                <span class="material-symbols-outlined text-lg text-on-surface-variant">email</span>
+                <span class="text-sm text-on-surface">Email List</span>
+                <span class="ml-auto text-[10px] text-outline">8.3K subs</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Content -->
+      <h2 class="font-headline text-base font-medium tracking-tight text-on-surface mb-3">Recent Content</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm overflow-hidden">
+            <div class="h-24 electric-gradient flex items-center justify-center">
+              <span class="material-symbols-outlined text-white text-4xl">image</span>
+            </div>
+            <div class="p-3">
+              <p class="text-sm font-medium text-on-surface">Happy Hour Announcement</p>
+              <p class="text-[11px] text-outline mt-0.5">Instagram · 3 days ago</p>
+              <div class="flex gap-3 mt-2">
+                <span class="text-[11px] text-primary">2.4K reached</span>
+                <span class="text-[11px] text-outline">·</span>
+                <span class="text-[11px] text-on-surface-variant">142 engagements</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm overflow-hidden">
+            <div class="h-24 flex items-center justify-center" style="background: linear-gradient(135deg, #00dce5 0%, #007c81 100%)">
+              <span class="material-symbols-outlined text-white text-4xl">brunch_dining</span>
+            </div>
+            <div class="p-3">
+              <p class="text-sm font-medium text-on-surface">Sunday Brunch Feature</p>
+              <p class="text-[11px] text-outline mt-0.5">Facebook · 5 days ago</p>
+              <div class="flex gap-3 mt-2">
+                <span class="text-[11px] text-tertiary">1.8K reached</span>
+                <span class="text-[11px] text-outline">·</span>
+                <span class="text-[11px] text-on-surface-variant">96 engagements</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm overflow-hidden">
+            <div class="h-24 flex items-center justify-center" style="background: linear-gradient(135deg, #7000ff 0%, #d1bcff 100%)">
+              <span class="material-symbols-outlined text-white text-4xl">loyalty</span>
+            </div>
+            <div class="p-3">
+              <p class="text-sm font-medium text-on-surface">Loyalty Points Email</p>
+              <p class="text-[11px] text-outline mt-0.5">Email · 1 week ago</p>
+              <div class="flex gap-3 mt-2">
+                <span class="text-[11px] text-secondary">8.3K sent</span>
+                <span class="text-[11px] text-outline">·</span>
+                <span class="text-[11px] text-on-surface-variant">34.2% opened</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ PROMOTIONS TAB ═══════════ -->
+    <div id="tab-promotions" class="tab-page">
+      <div class="mt-4 mb-4 flex items-center justify-between">
+        <div>
+          <h1 class="font-headline text-2xl font-semibold text-on-surface">Active Promotions</h1>
+          <p class="text-sm text-outline mt-0.5">Manage and track all your restaurant promotions</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-3 py-1.5 bg-surface-container text-on-surface-variant text-sm rounded-sm flex items-center gap-1.5 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-base">filter_list</span>Filter
+          </button>
+          <button class="px-3 py-1.5 bg-surface-container text-on-surface-variant text-sm rounded-sm flex items-center gap-1.5 hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-base">download</span>Export
+          </button>
+          <button class="px-3 py-1.5 electric-gradient text-white text-sm rounded-sm flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-base">add</span>New Promo
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4 text-center">
+            <p class="text-[10px] uppercase tracking-widest text-outline font-medium mb-1">Active Promos</p>
+            <p class="font-headline text-3xl font-bold text-primary tabular-numbers">5</p>
+          </div>
+        </div>
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4 text-center">
+            <p class="text-[10px] uppercase tracking-widest text-outline font-medium mb-1">Total Redemptions</p>
+            <p class="font-headline text-3xl font-bold text-on-surface tabular-numbers">892</p>
+          </div>
+        </div>
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4 text-center">
+            <p class="text-[10px] uppercase tracking-widest text-outline font-medium mb-1">Revenue Generated</p>
+            <p class="font-headline text-3xl font-bold text-tertiary tabular-numbers">$14.2K</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Promotion Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div class="p-1 rounded-sm bg-surface-container-high group hover:bg-surface-container-highest transition-all duration-300">
+          <div class="bg-surface-container rounded-sm p-4 flex flex-col gap-3">
+            <div class="flex items-start justify-between">
+              <div class="w-9 h-9 rounded-sm electric-gradient flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-base">local_bar</span>
+              </div>
+              <span class="px-2 py-0.5 bg-primary-container/20 border border-primary/30 rounded-full text-[9px] uppercase font-bold tracking-tighter text-primary">Active</span>
+            </div>
+            <div>
+              <p class="font-headline text-sm font-semibold text-on-surface">Happy Hour 50% Off Drinks</p>
+              <p class="text-[11px] text-outline mt-0.5">Mon–Fri · 4PM–7PM</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Redeemed</p>
+                <p class="font-headline text-base font-bold text-on-surface tabular-numbers">142</p>
+              </div>
+              <div>
+                <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Revenue</p>
+                <p class="font-headline text-base font-bold text-on-surface tabular-numbers">$2.4K</p>
+              </div>
+            </div>
+            <p class="text-[10px] text-outline">Ends Jul 31, 2026</p>
+          </div>
+        </div>
+        <div class="p-1 rounded-sm bg-surface-container-high group hover:bg-surface-container-highest transition-all duration-300">
+          <div class="bg-surface-container rounded-sm p-4 flex flex-col gap-3">
+            <div class="flex items-start justify-between">
+              <div class="w-9 h-9 rounded-sm flex items-center justify-center" style="background: rgba(0,220,229,0.15)">
+                <span class="material-symbols-outlined text-base" style="color:#00dce5">brunch_dining</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-tighter" style="background:rgba(0,220,229,0.1); border: 1px solid rgba(0,220,229,0.3); color:#00dce5">Active</span>
+            </div>
+            <div>
+              <p class="font-headline text-sm font-semibold text-on-surface">Weekend Brunch Special</p>
+              <p class="text-[11px] text-outline mt-0.5">Sat–Sun · All Day</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Covers</p>
+                <p class="font-headline text-base font-bold text-on-surface tabular-numbers">384</p>
+              </div>
+              <div>
+                <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Revenue</p>
+                <p class="font-headline text-base font-bold text-on-surface tabular-numbers">$7.6K</p>
+              </div>
+            </div>
+            <p class="text-[10px] text-outline">Ongoing</p>
+          </div>
+        </div>
+        <div class="p-1 rounded-sm bg-surface-container-high group hover:bg-surface-container-highest transition-all duration-300">
+          <div class="bg-surface-container rounded-sm p-4 flex flex-col gap-3">
+            <div class="flex items-start justify-between">
+              <div class="w-9 h-9 rounded-sm flex items-center justify-center" style="background: rgba(209,188,255,0.15)">
+                <span class="material-symbols-outlined text-base" style="color:#d1bcff">loyalty</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-tighter" style="background:rgba(209,188,255,0.1); border: 1px solid rgba(209,188,255,0.3); color:#d1bcff">Active</span>
+            </div>
+            <div>
+              <p class="font-headline text-sm font-semibold text-on-surface">Loyalty Points Double Day</p>
+              <p class="text-[11px] text-outline mt-0.5">Every Wednesday</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Members</p>
+                <p class="font-headline text-base font-bold text-on-surface tabular-numbers">1.4K</p>
+              </div>
+              <div>
+                <p class="text-[9px] uppercase tracking-wider text-outline mb-0.5">Pts Issued</p>
+                <p class="font-headline text-base font-bold text-on-surface tabular-numbers">28K</p>
+              </div>
+            </div>
+            <p class="text-[10px] text-outline">Ongoing</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Promo Timeline -->
+      <div class="p-1 rounded-sm bg-surface-container-high">
+        <div class="bg-surface-container rounded-sm p-4">
+          <h3 class="font-headline text-base font-medium text-on-surface mb-3">Promotion Schedule</h3>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full bg-primary"></div>
+              <span class="text-xs text-on-surface-variant w-24">Mon–Fri 4–7PM</span>
+              <div class="flex-1 h-6 rounded-sm electric-gradient opacity-80 flex items-center px-3">
+                <span class="text-[10px] text-white font-medium">Happy Hour</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full" style="background:#00dce5"></div>
+              <span class="text-xs text-on-surface-variant w-24">Sat–Sun All Day</span>
+              <div class="flex-1 h-6 rounded-sm flex items-center px-3" style="background:rgba(0,220,229,0.3)">
+                <span class="text-[10px] font-medium" style="color:#00dce5">Weekend Brunch</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full" style="background:#d1bcff"></div>
+              <span class="text-xs text-on-surface-variant w-24">Wed All Day</span>
+              <div class="flex-1 h-6 rounded-sm flex items-center px-3" style="background:rgba(209,188,255,0.2)">
+                <span class="text-[10px] font-medium" style="color:#d1bcff">Double Points Day</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ ANALYTICS TAB ═══════════ -->
+    <div id="tab-analytics" class="tab-page">
+      <div class="mt-4 mb-4">
+        <h1 class="font-headline text-2xl font-semibold text-on-surface">Analytics</h1>
+        <p class="text-sm text-outline mt-0.5">Marketing performance and ROI tracking</p>
+      </div>
+
+      <!-- Financial Bento -->
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4">
+            <p class="text-[10px] uppercase tracking-widest text-outline font-medium mb-2">Marketing ROI</p>
+            <p class="font-headline text-3xl font-bold text-primary tabular-numbers">4.2×</p>
+            <p class="text-[11px] text-outline mt-1">$4.20 returned per $1 spent</p>
+            <div class="w-full h-1 bg-surface-container-lowest rounded-full overflow-hidden mt-3">
+              <div class="bar-segment h-full rounded-full electric-gradient" style="width:84%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4">
+            <p class="text-[10px] uppercase tracking-widest text-outline font-medium mb-2">Cost per Acquisition</p>
+            <p class="font-headline text-3xl font-bold text-on-surface tabular-numbers">$8.40</p>
+            <p class="text-[11px] text-outline mt-1">↓ 12% vs last month</p>
+            <div class="w-full h-1 bg-surface-container-lowest rounded-full overflow-hidden mt-3">
+              <div class="h-full rounded-full" style="width:60%; background:#00dce5"></div>
+            </div>
+          </div>
+        </div>
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4">
+            <p class="text-[10px] uppercase tracking-widest text-outline font-medium mb-2">Customer LTV</p>
+            <p class="font-headline text-3xl font-bold text-secondary tabular-numbers">$284</p>
+            <p class="text-[11px] text-outline mt-1">↑ 8% vs last quarter</p>
+            <div class="w-full h-1 bg-surface-container-lowest rounded-full overflow-hidden mt-3">
+              <div class="h-full rounded-full" style="width:71%; background:#d1bcff"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Bar Chart -->
+      <div class="p-1 rounded-sm bg-surface-container-high mb-4">
+        <div class="bg-surface-container rounded-sm p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-headline text-base font-medium text-on-surface">Marketing Revenue (Last 6 Months)</h3>
+            <span class="text-[11px] text-outline">Total: $48.2K</span>
+          </div>
+          <div class="flex items-end justify-between gap-2 h-32">
+            <div class="flex flex-col items-center gap-1 flex-1">
+              <div class="w-full rounded-t-sm electric-gradient" style="height:48%"></div>
+              <span class="text-[9px] text-outline">Jan</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 flex-1">
+              <div class="w-full rounded-t-sm electric-gradient" style="height:62%"></div>
+              <span class="text-[9px] text-outline">Feb</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 flex-1">
+              <div class="w-full rounded-t-sm electric-gradient" style="height:55%"></div>
+              <span class="text-[9px] text-outline">Mar</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 flex-1">
+              <div class="w-full rounded-t-sm electric-gradient" style="height:71%"></div>
+              <span class="text-[9px] text-outline">Apr</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 flex-1">
+              <div class="w-full rounded-t-sm electric-gradient" style="height:85%"></div>
+              <span class="text-[9px] text-outline">May</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 flex-1">
+              <div class="w-full rounded-t-sm" style="height:94%; background:linear-gradient(180deg,#4cd6ff,#7000ff); opacity:1"></div>
+              <span class="text-[9px] text-primary font-medium">Jun</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversion Events Table -->
+      <div class="p-1 rounded-sm bg-surface-container-high">
+        <div class="bg-surface-container rounded-sm">
+          <div class="p-4 border-b border-outline-variant/20">
+            <h3 class="font-headline text-base font-medium text-on-surface">Recent Conversion Events</h3>
+          </div>
+          <div class="divide-y divide-outline-variant/10">
+            <div class="flex items-center gap-4 px-4 py-3">
+              <span class="material-symbols-outlined text-primary text-base">restaurant</span>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface">Table Reservation via Instagram Ad</p>
+                <p class="text-[11px] text-outline">Party of 4 · $180 check</p>
+              </div>
+              <span class="text-[11px] text-primary font-medium">+$180</span>
+            </div>
+            <div class="flex items-center gap-4 px-4 py-3">
+              <span class="material-symbols-outlined text-tertiary text-base">redeem</span>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface">Happy Hour Coupon Redeemed</p>
+                <p class="text-[11px] text-outline">Table of 2 · $64 check</p>
+              </div>
+              <span class="text-[11px] text-tertiary font-medium">+$64</span>
+            </div>
+            <div class="flex items-center gap-4 px-4 py-3">
+              <span class="material-symbols-outlined text-secondary text-base">loyalty</span>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface">Loyalty Member Repeat Visit</p>
+                <p class="text-[11px] text-outline">Solo diner · $42 check</p>
+              </div>
+              <span class="text-[11px] text-secondary font-medium">+$42</span>
+            </div>
+            <div class="flex items-center gap-4 px-4 py-3">
+              <span class="material-symbols-outlined text-on-surface-variant text-base">email</span>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface">Email Click → Online Order</p>
+                <p class="text-[11px] text-outline">Takeout order · $38</p>
+              </div>
+              <span class="text-[11px] text-on-surface-variant font-medium">+$38</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ AUDIENCE TAB ═══════════ -->
+    <div id="tab-audience" class="tab-page">
+      <div class="mt-4 mb-4">
+        <h1 class="font-headline text-2xl font-semibold text-on-surface">Audience</h1>
+        <p class="text-sm text-outline mt-0.5">Customer segments and engagement intelligence</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <!-- Customer Segments -->
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4">
+            <h3 class="font-headline text-base font-medium text-on-surface mb-3">Customer Segments</h3>
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center justify-between p-2 rounded-sm bg-surface-container-high hover:bg-surface-container-highest transition-colors">
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full electric-gradient"></div>
+                  <span class="text-sm text-on-surface">VIP Loyalists</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-20 h-1 bg-surface-container-lowest rounded-full overflow-hidden">
+                    <div class="h-full electric-gradient" style="width:22%"></div>
+                  </div>
+                  <span class="text-[11px] text-on-surface-variant w-8 text-right tabular-numbers">312</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-sm bg-surface-container-high hover:bg-surface-container-highest transition-colors">
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full" style="background:#00dce5"></div>
+                  <span class="text-sm text-on-surface">Regular Visitors</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-20 h-1 bg-surface-container-lowest rounded-full overflow-hidden">
+                    <div class="h-full" style="width:58%; background:#00dce5"></div>
+                  </div>
+                  <span class="text-[11px] text-on-surface-variant w-8 text-right tabular-numbers">840</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-sm bg-surface-container-high hover:bg-surface-container-highest transition-colors">
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full" style="background:#d1bcff"></div>
+                  <span class="text-sm text-on-surface">Occasional Diners</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-20 h-1 bg-surface-container-lowest rounded-full overflow-hidden">
+                    <div class="h-full" style="width:35%; background:#d1bcff"></div>
+                  </div>
+                  <span class="text-[11px] text-on-surface-variant w-8 text-right tabular-numbers">512</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-sm bg-surface-container-high hover:bg-surface-container-highest transition-colors">
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full bg-outline"></div>
+                  <span class="text-sm text-on-surface">At-Risk (Inactive)</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-20 h-1 bg-surface-container-lowest rounded-full overflow-hidden">
+                    <div class="h-full bg-outline" style="width:18%"></div>
+                  </div>
+                  <span class="text-[11px] text-on-surface-variant w-8 text-right tabular-numbers">260</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demographics -->
+        <div class="p-1 rounded-sm bg-surface-container-high">
+          <div class="bg-surface-container rounded-sm p-4">
+            <h3 class="font-headline text-base font-medium text-on-surface mb-3">Age Demographics</h3>
+            <div class="flex flex-col gap-2">
+              <div>
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-on-surface-variant">18–24</span>
+                  <span class="text-outline">14%</span>
+                </div>
+                <div class="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div class="h-full electric-gradient" style="width:14%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-on-surface-variant">25–34</span>
+                  <span class="text-outline">38%</span>
+                </div>
+                <div class="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div class="h-full electric-gradient" style="width:38%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-on-surface-variant">35–44</span>
+                  <span class="text-outline">28%</span>
+                </div>
+                <div class="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div class="h-full" style="width:28%; background:#00dce5"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-on-surface-variant">45–54</span>
+                  <span class="text-outline">13%</span>
+                </div>
+                <div class="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div class="h-full" style="width:13%; background:#d1bcff"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-on-surface-variant">55+</span>
+                  <span class="text-outline">7%</span>
+                </div>
+                <div class="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
+                  <div class="h-full bg-outline" style="width:7%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Customers -->
+      <div class="p-1 rounded-sm bg-surface-container-high mb-4">
+        <div class="bg-surface-container rounded-sm">
+          <div class="p-4 border-b border-outline-variant/20">
+            <h3 class="font-headline text-base font-medium text-on-surface">Top Customers This Month</h3>
+          </div>
+          <div class="divide-y divide-outline-variant/10">
+            <div class="flex items-center gap-4 px-4 py-3">
+              <div class="w-8 h-8 rounded-full electric-gradient flex items-center justify-center text-xs font-bold text-white">JD</div>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface font-medium">Jane Doe</p>
+                <p class="text-[11px] text-outline">8 visits · VIP Loyalist</p>
+              </div>
+              <span class="px-2 py-0.5 bg-primary-container/20 border border-primary/30 rounded-full text-[9px] uppercase font-bold tracking-tighter text-primary">$640 LTV</span>
+            </div>
+            <div class="flex items-center gap-4 px-4 py-3">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style="background:linear-gradient(135deg,#00dce5,#007c81)">MS</div>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface font-medium">Marcus Smith</p>
+                <p class="text-[11px] text-outline">6 visits · Regular</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-tighter" style="background:rgba(0,220,229,0.1); border:1px solid rgba(0,220,229,0.3); color:#00dce5">$420 LTV</span>
+            </div>
+            <div class="flex items-center gap-4 px-4 py-3">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style="background:linear-gradient(135deg,#7000ff,#d1bcff)">AL</div>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface font-medium">Amy Liu</p>
+                <p class="text-[11px] text-outline">5 visits · Regular</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-tighter" style="background:rgba(209,188,255,0.1); border:1px solid rgba(209,188,255,0.3); color:#d1bcff">$310 LTV</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Re-engagement Timeline -->
+      <div class="p-1 rounded-sm bg-surface-container-high">
+        <div class="bg-surface-container rounded-sm p-4">
+          <h3 class="font-headline text-base font-medium text-on-surface mb-3">Re-engagement Schedule</h3>
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-sm bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-base">email</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface">30-Day Inactive Email</p>
+                <p class="text-[11px] text-outline">260 customers · Sends Wed Jun 19</p>
+              </div>
+              <span class="px-2 py-0.5 bg-primary-container/20 border border-primary/30 rounded-full text-[9px] uppercase font-bold tracking-tighter text-primary">Scheduled</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-sm flex items-center justify-center" style="background:rgba(0,220,229,0.1)">
+                <span class="material-symbols-outlined text-base" style="color:#00dce5">sms</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm text-on-surface">Win-Back SMS Offer</p>
+                <p class="text-[11px] text-outline">90-day inactive · 20% off coupon</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-tighter" style="background:rgba(0,220,229,0.1); border:1px solid rgba(0,220,229,0.3); color:#00dce5">Draft</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Deploy Campaign FAB -->
+  <button id="fab" onclick="switchTab('content')" class="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-50 electric-gradient text-white px-5 py-3 rounded-full flex items-center gap-2 shadow-lg hover:opacity-90 transition-opacity font-medium text-sm">
+    <span class="material-symbols-outlined text-base">rocket_launch</span>
+    <span class="hidden md:inline">Deploy Campaign</span>
+  </button>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-container-lowest border-t border-surface-container-highest/15 flex">
+    <button onclick="switchTab('campaign')" class="mob-nav flex-1 flex flex-col items-center py-2 gap-0.5" data-tab="campaign">
+      <span class="material-symbols-outlined text-xl text-primary">campaign</span>
+      <span class="text-[9px] text-primary font-medium">Campaign</span>
+    </button>
+    <button onclick="switchTab('content')" class="mob-nav flex-1 flex flex-col items-center py-2 gap-0.5" data-tab="content">
+      <span class="material-symbols-outlined text-xl text-outline">edit_note</span>
+      <span class="text-[9px] text-outline">Content</span>
+    </button>
+    <button onclick="switchTab('promotions')" class="mob-nav flex-1 flex flex-col items-center py-2 gap-0.5" data-tab="promotions">
+      <span class="material-symbols-outlined text-xl text-outline">local_offer</span>
+      <span class="text-[9px] text-outline">Promos</span>
+    </button>
+    <button onclick="switchTab('analytics')" class="mob-nav flex-1 flex flex-col items-center py-2 gap-0.5" data-tab="analytics">
+      <span class="material-symbols-outlined text-xl text-outline">bar_chart</span>
+      <span class="text-[9px] text-outline">Analytics</span>
+    </button>
+    <button onclick="switchTab('audience')" class="mob-nav flex-1 flex flex-col items-center py-2 gap-0.5" data-tab="audience">
+      <span class="material-symbols-outlined text-xl text-outline">people</span>
+      <span class="text-[9px] text-outline">Audience</span>
+    </button>
+  </nav>
+
+  <script>
+    function switchTab(tabName) {
+      // Hide all pages
+      document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+      // Show selected
+      document.getElementById('tab-' + tabName).classList.add('active');
+      // Update desktop nav
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.classList.remove('active', 'text-primary');
+        btn.classList.add('text-on-surface-variant');
+      });
+      const activeNav = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+      if (activeNav) {
+        activeNav.classList.add('active', 'text-primary');
+        activeNav.classList.remove('text-on-surface-variant');
+      }
+      // Update mobile nav
+      document.querySelectorAll('.mob-nav').forEach(btn => {
+        const icon = btn.querySelector('.material-symbols-outlined');
+        const label = btn.querySelector('span:last-child');
+        icon.classList.remove('text-primary');
+        icon.classList.add('text-outline');
+        label.classList.remove('text-primary');
+        label.classList.add('text-outline');
+      });
+      const activeMob = document.querySelector(`.mob-nav[data-tab="${tabName}"]`);
+      if (activeMob) {
+        const icon = activeMob.querySelector('.material-symbols-outlined');
+        const label = activeMob.querySelector('span:last-child');
+        icon.classList.remove('text-outline');
+        icon.classList.add('text-primary');
+        label.classList.remove('text-outline');
+        label.classList.add('text-primary');
+      }
+      // Hide FAB on campaign tab
+      document.getElementById('fab').style.display = tabName === 'content' ? 'none' : 'flex';
+    }
+
+    function setContentType(btn, type) {
+      document.querySelectorAll('.content-type-btn').forEach(b => {
+        b.classList.remove('bg-primary', 'text-on-primary');
+        b.classList.add('bg-surface-container', 'text-on-surface-variant');
+      });
+      btn.classList.add('bg-primary', 'text-on-primary');
+      btn.classList.remove('bg-surface-container', 'text-on-surface-variant');
+    }
+  </script>
+</body>
+</html>
