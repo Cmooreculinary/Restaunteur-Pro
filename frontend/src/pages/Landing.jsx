@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 
 const Landing = () => {
   const handleLogin = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
     const redirectUrl = window.location.origin + '/dashboard';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+    const authBase = process.env.REACT_APP_OAUTH_URL || 'https://auth.emergentagent.com';
+    window.location.href = `${authBase}/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   const modules = [

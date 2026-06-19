@@ -214,10 +214,14 @@ async def exchange_session(request: Request, response: Response):
     if not session_id:
         raise HTTPException(status_code=400, detail="session_id required")
     
-    # Call Emergent Auth to get user data
+    # Exchange session_id with the configured OAuth provider
+    oauth_session_url = os.environ.get(
+        "OAUTH_SESSION_URL",
+        "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
+    )
     async with httpx.AsyncClient() as client_http:
         resp = await client_http.get(
-            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+            oauth_session_url,
             headers={"X-Session-ID": session_id}
         )
         
@@ -635,60 +639,64 @@ async def mark_notifications_read(user: User = Depends(get_current_user)):
 
 @api_router.post("/ai/analyze")
 async def ai_analysis(data: AIAnalysisRequest, user: User = Depends(get_current_user)):
-    """AI-powered analysis using GPT-5.2"""
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
-    
-    api_key = os.environ.get("EMERGENT_LLM_KEY")
+    """AI-powered analysis"""
+    from openai import AsyncOpenAI
+
+    api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise HTTPException(status_code=500, detail="AI service not configured")
-    
+
     system_messages = {
         "lease": "You are an expert restaurant lease analyst. Analyze lease terms and identify potential issues, favorable clauses, and negotiation points. Provide actionable recommendations.",
         "menu": "You are a restaurant menu engineering expert. Analyze menu items for profitability, pricing strategy, and cost optimization. Provide specific recommendations.",
         "cost": "You are a restaurant cost analyst. Calculate food costs, suggest pricing, and identify opportunities for cost reduction while maintaining quality.",
         "site": "You are a restaurant site analysis expert. Evaluate location potential based on demographics, foot traffic, competition, and market conditions."
     }
-    
+
     system_message = system_messages.get(data.analysis_type, "You are a helpful restaurant business assistant.")
-    
-    chat = LlmChat(
-        api_key=api_key,
-        session_id=f"analysis_{user.user_id}_{data.project_id}",
-        system_message=system_message
-    ).with_model("openai", "gpt-5.2")
-    
-    user_message = UserMessage(text=data.content)
-    response = await chat.send_message(user_message)
-    
+
+    client_ai = AsyncOpenAI(api_key=api_key)
+    completion = await client_ai.chat.completions.create(
+        model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+        messages=[
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": data.content},
+        ],
+    )
+    response = completion.choices[0].message.content
+
     return {"analysis": response, "type": data.analysis_type}
 
 @api_router.post("/ai/cost-calculator")
 async def ai_cost_calculator(data: dict, user: User = Depends(get_current_user)):
     """AI-powered recipe cost calculator"""
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
-    
-    api_key = os.environ.get("EMERGENT_LLM_KEY")
+    from openai import AsyncOpenAI
+
+    api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise HTTPException(status_code=500, detail="AI service not configured")
-    
-    chat = LlmChat(
-        api_key=api_key,
-        session_id=f"cost_calc_{user.user_id}",
-        system_message="""You are a restaurant cost calculator. Given ingredient costs and quantities, calculate:
+
+    system_prompt = """You are a restaurant cost calculator. Given ingredient costs and quantities, calculate:
 1. Total recipe cost
 2. Cost per serving
 3. Suggested menu price (targeting 30% food cost)
 4. Profit margin analysis
 Respond in a structured format."""
-    ).with_model("openai", "gpt-5.2")
-    
+
     ingredients = data.get("ingredients", "")
     servings = data.get("servings", 1)
-    
     prompt = f"Calculate costs for this recipe:\n{ingredients}\nNumber of servings: {servings}"
-    user_message = UserMessage(text=prompt)
-    response = await chat.send_message(user_message)
-    
+
+    client_ai = AsyncOpenAI(api_key=api_key)
+    completion = await client_ai.chat.completions.create(
+        model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ],
+    )
+    response = completion.choices[0].message.content
+
     return {"calculation": response}
 
 # ==================== SITE DEMOGRAPHICS (SIMULATED LIVE DATA) ====================
@@ -743,10 +751,19 @@ async def health():
 # Include router and middleware
 app.include_router(api_router)
 
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "ALLOWED_ORIGINS",
+        "http://localhost:3000,http://localhost:3001"
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
