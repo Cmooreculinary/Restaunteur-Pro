@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone, timedelta
+from urllib.parse import urlencode
 import httpx
 
 ROOT_DIR = Path(__file__).parent
@@ -205,51 +206,56 @@ async def get_current_user(request: Request) -> User:
     
     return User(**user)
 
-@api_router.post("/auth/session")
-async def exchange_session(request: Request, response: Response):
-    """Exchange session_id from Emergent Auth for a session token"""
-    body = await request.json()
-    session_id = body.get("session_id")
-    
-    if not session_id:
-        raise HTTPException(status_code=400, detail="session_id required")
-    
-    # Exchange session_id with the configured OAuth provider
-    oauth_session_url = os.environ.get(
-        "OAUTH_SESSION_URL",
-        "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
-    )
+@api_router.get("/auth/login")
+async def google_login():
+    """Redirect to Google OAuth consent screen"""
+    params = {
+        "client_id": os.environ["GOOGLE_CLIENT_ID"],
+        "redirect_uri": os.environ["GOOGLE_REDIRECT_URI"],
+        "response_type": "code",
+        "scope": "openid email profile",
+        "access_type": "offline",
+        "prompt": "select_account",
+    }
+    return RedirectResponse(f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}")
+
+@api_router.get("/auth/callback")
+async def google_callback(code: str, response: Response):
+    """Exchange Google auth code for session"""
     async with httpx.AsyncClient() as client_http:
-        resp = await client_http.get(
-            oauth_session_url,
-            headers={"X-Session-ID": session_id}
+        token_resp = await client_http.post("https://oauth2.googleapis.com/token", data={
+            "code": code,
+            "client_id": os.environ["GOOGLE_CLIENT_ID"],
+            "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
+            "redirect_uri": os.environ["GOOGLE_REDIRECT_URI"],
+            "grant_type": "authorization_code",
+        })
+        if token_resp.status_code != 200:
+            raise HTTPException(status_code=401, detail="Google token exchange failed")
+
+        userinfo_resp = await client_http.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            headers={"Authorization": f"Bearer {token_resp.json()['access_token']}"}
         )
-        
-        if resp.status_code != 200:
-            raise HTTPException(status_code=401, detail="Invalid session_id")
-        
-        auth_data = resp.json()
-    
-    user_id = f"user_{uuid.uuid4().hex[:12]}"
+        auth_data = userinfo_resp.json()
+
     email = auth_data.get("email")
-    
-    # Check if user exists
+    if not email:
+        raise HTTPException(status_code=401, detail="No email from Google")
+
     existing_user = await db.users.find_one({"email": email}, {"_id": 0})
     if existing_user:
         user_id = existing_user["user_id"]
     else:
-        # Create new user
-        new_user = {
+        user_id = f"user_{uuid.uuid4().hex[:12]}"
+        await db.users.insert_one({
             "user_id": user_id,
             "email": email,
             "name": auth_data.get("name", "User"),
             "picture": auth_data.get("picture"),
-            "created_at": datetime.now(timezone.utc).isoformat()
-        }
-        await db.users.insert_one(new_user)
-        
-        # Create default project for new user
-        default_project = {
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        await db.projects.insert_one({
             "project_id": f"proj_{uuid.uuid4().hex[:12]}",
             "user_id": user_id,
             "name": "My First Restaurant",
@@ -258,35 +264,32 @@ async def exchange_session(request: Request, response: Response):
             "completion": 15,
             "budget_total": 500000,
             "budget_invested": 75000,
-            "created_at": datetime.now(timezone.utc).isoformat()
-        }
-        await db.projects.insert_one(default_project)
-    
-    # Create session
-    session_token = auth_data.get("session_token", f"sess_{uuid.uuid4().hex}")
-    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
-    
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+
+    session_token = f"sess_{uuid.uuid4().hex}"
+    expires_at = datetime.now(timezone.utc) + timedelta(days=30)
+
     await db.user_sessions.delete_many({"user_id": user_id})
     await db.user_sessions.insert_one({
         "user_id": user_id,
         "session_token": session_token,
         "expires_at": expires_at.isoformat(),
-        "created_at": datetime.now(timezone.utc).isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat(),
     })
-    
-    user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
-    
-    response.set_cookie(
+
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+    redirect = RedirectResponse(f"{frontend_url}/dashboard")
+    redirect.set_cookie(
         key="session_token",
         value=session_token,
         httponly=True,
         secure=True,
         samesite="none",
         path="/",
-        max_age=7 * 24 * 60 * 60
+        max_age=30 * 24 * 60 * 60,
     )
-    
-    return user
+    return redirect
 
 @api_router.get("/auth/me")
 async def get_me(user: User = Depends(get_current_user)):

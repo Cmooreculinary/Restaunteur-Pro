@@ -3,9 +3,7 @@ import { Button } from "@/components/ui/button";
 
 const Landing = () => {
   const handleLogin = () => {
-    const redirectUrl = window.location.origin + '/dashboard';
-    const authBase = process.env.REACT_APP_OAUTH_URL || 'https://auth.emergentagent.com';
-    window.location.href = `${authBase}/?redirect=${encodeURIComponent(redirectUrl)}`;
+    window.location.href = `${process.env.REACT_APP_BACKEND_URL}/api/auth/login`;
   };
 
   const modules = [

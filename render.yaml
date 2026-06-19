@@ -27,5 +27,17 @@ services:
         sync: false
       - key: DB_NAME
         sync: false
-      - key: SECRET_KEY
-        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
