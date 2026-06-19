@@ -2,10 +2,8 @@
 
 ## Maestro
 
-### Naming collision flag
-Maestro conflicts with the Wix mobile testing tool "Maestro" — flag before any brand spend.
-Options: rename to "Conductor", "Baton", "Orchestr8", or add a suffix ("Maestro by BCA").
-Do NOT resolve here; raise with Chef as a decision gate.
+### Naming — DECIDED: Keep "Maestro"
+Chef confirmed 2026-06-19. Collision with Wix testing tool accepted. No rename.
 
 ### Audit
 ```bash
@@ -17,7 +15,7 @@ grep -n "allow_origins\|allow_credentials" backend/server.py 2>/dev/null
 - [ ] Create record → persists in DB → reload retrieves it
 - [ ] No Emergent refs
 - [ ] CORS clean
-- [ ] Naming collision flagged for decision
+- [x] Naming collision — DECIDED: keep "Maestro" (2026-06-19)
 
 ## VaultSpace 2.0 (peaks-altitude-os)
 
