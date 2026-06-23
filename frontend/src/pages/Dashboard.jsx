@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { 
+import {
   ChefHat, LayoutDashboard, Map, Hammer, Rocket, TrendingUp, FileText,
-  Bell, Search, LogOut, Settings, User, Plus, ChevronRight, ChevronDown,
+  Megaphone, Bell, Search, LogOut, Settings, User, Plus, ChevronRight, ChevronDown,
   AlertTriangle, CheckCircle, Clock, ArrowUpRight, ArrowDownRight, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import GroundUp from "@/components/modules/GroundUp";
 import OpsLaunchpad from "@/components/modules/OpsLaunchpad";
 import ExpansionToolkit from "@/components/modules/ExpansionToolkit";
 import LeaseNegotiation from "@/components/modules/LeaseNegotiation";
+import MarketeerAgent from "@/components/modules/MarketeerAgent";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -98,6 +99,7 @@ const Dashboard = ({ user, setUser }) => {
     { id: "ops", icon: Rocket, label: "Ops Launchpad" },
     { id: "expansion", icon: TrendingUp, label: "Expansion Toolkit" },
     { id: "lease", icon: FileText, label: "Lease Negotiation" },
+    { id: "marketeer", icon: Megaphone, label: "Marketeer Agent" },
   ];
 
   return (
@@ -278,7 +280,10 @@ const Dashboard = ({ user, setUser }) => {
 
       {/* Main Content */}
       <main className="p-6">
-        {activeProject ? (
+        {/* Marketeer Agent works without a project */}
+        {activeTab === "marketeer" && <MarketeerAgent />}
+
+        {activeTab !== "marketeer" && activeProject ? (
           <>
             {activeTab === "command" && (
               <CommandCenter project={activeProject} onProjectUpdate={fetchProjects} />
@@ -299,7 +304,7 @@ const Dashboard = ({ user, setUser }) => {
               <LeaseNegotiation project={activeProject} />
             )}
           </>
-        ) : (
+        ) : activeTab !== "marketeer" ? (
           <div className="flex flex-col items-center justify-center h-96 text-center">
             <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
               <ChefHat className="w-8 h-8 text-zinc-500" />
