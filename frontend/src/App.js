@@ -11,6 +11,8 @@ import Dashboard from "@/pages/Dashboard";
 import Onboarding from "@/pages/Onboarding";
 import Pricing from "@/pages/Pricing";
 import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
+import Donations from "@/pages/Donations";
+import DonationSuccess from "@/pages/DonationSuccess";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -145,6 +147,8 @@ function AppRouter() {
           />
           <Route path="/pricing" element={<Pricing user={user} />} />
           <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+          <Route path="/donate" element={<Donations user={user} />} />
+          <Route path="/donation/success" element={<DonationSuccess />} />
         </Routes>
       )}
     </AuthContext>

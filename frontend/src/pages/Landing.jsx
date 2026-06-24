@@ -381,7 +381,11 @@ const Landing = ({ setUser }) => {
             <ChefHat className="w-5 h-5 text-[#d4af37]" />
             <span className="text-sm text-zinc-500">Restaurateur Pro</span>
           </div>
-          <p className="text-xs text-zinc-600">© 2026 Restaurateur Pro. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <a href="/pricing" className="text-xs text-zinc-600 hover:text-zinc-400">Pricing</a>
+            <a href="/donate" className="text-xs text-zinc-600 hover:text-[#d4af37]">Support Us ♥</a>
+            <p className="text-xs text-zinc-600">© 2026 Restaurateur Pro. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

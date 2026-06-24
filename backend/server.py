@@ -1468,6 +1468,86 @@ async def stripe_webhook(request: Request):
 
     return {"received": True}
 
+# ==================== DONATIONS ====================
+
+class DonationRequest(BaseModel):
+    amount: float
+    donor_name: str = "Anonymous"
+    message: str = ""
+    origin_url: str
+
+@api_router.post("/donations/checkout")
+async def create_donation_checkout(data: DonationRequest):
+    """Create a Stripe checkout session for a one-time donation"""
+    if data.amount < 1:
+        raise HTTPException(status_code=400, detail="Minimum donation is $1")
+
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Payment service not configured")
+
+    stripe.api_key = stripe_api_key
+
+    try:
+        session = stripe.checkout.Session.create(
+            mode="payment",
+            payment_method_types=["card"],
+            line_items=[{
+                "price_data": {
+                    "currency": "usd",
+                    "unit_amount": int(data.amount * 100),
+                    "product_data": {
+                        "name": "Restaurateur Pro Community Support",
+                        "description": f"Donation from {data.donor_name}" + (f": {data.message}" if data.message else ""),
+                        "images": [],
+                    },
+                },
+                "quantity": 1,
+            }],
+            success_url=f"{data.origin_url}/donation/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{data.origin_url}/donate",
+            metadata={
+                "donor_name": data.donor_name,
+                "message": data.message,
+                "amount": str(data.amount),
+            },
+        )
+
+        await db.donations.insert_one({
+            "donation_id": f"don_{uuid.uuid4().hex[:12]}",
+            "session_id": session.id,
+            "donor_name": data.donor_name,
+            "message": data.message,
+            "amount": data.amount,
+            "currency": "usd",
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+
+        return {"url": session.url, "session_id": session.id}
+
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/donations/status/{session_id}")
+async def get_donation_status(session_id: str):
+    """Check donation payment status"""
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Payment service not configured")
+
+    stripe.api_key = stripe_api_key
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+        if session.payment_status == "paid":
+            await db.donations.update_one(
+                {"session_id": session_id},
+                {"$set": {"status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
+            )
+        return {"status": session.status, "payment_status": session.payment_status, "amount": session.amount_total}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
