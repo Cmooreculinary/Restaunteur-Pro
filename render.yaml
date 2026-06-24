@@ -7,16 +7,18 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: MONGO_URL
-        sync: false          # set manually in Render dashboard
-      - key: DB_NAME
-        sync: false
+      - key: DB_PATH
+        value: /data/restaunteur.db
       - key: ANTHROPIC_API_KEY
-        sync: false
+        sync: false          # set manually in Render dashboard
       - key: STRIPE_API_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
+    disk:
+      name: restaunteur-data
+      mountPath: /data
+      sizeGB: 1
     healthCheckPath: /api/health
     autoDeploy: true
 
