@@ -743,10 +743,12 @@ async def health():
 # Include router and middleware
 app.include_router(api_router)
 
+ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "").split(",")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=[o.strip() for o in ALLOWED_ORIGINS if o.strip()],
     allow_methods=["*"],
     allow_headers=["*"],
 )
