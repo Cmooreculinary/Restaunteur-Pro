@@ -643,41 +643,27 @@ async def mark_notifications_read(user: User = Depends(get_current_user)):
 @api_router.post("/ai/analyze")
 async def ai_analysis(data: AIAnalysisRequest, user: User = Depends(get_current_user)):
     """AI-powered analysis"""
-    from openai import AsyncOpenAI
-
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="AI service not configured")
+    from ai_client import chat_complete
 
     system_messages = {
         "lease": "You are an expert restaurant lease analyst. Analyze lease terms and identify potential issues, favorable clauses, and negotiation points. Provide actionable recommendations.",
         "menu": "You are a restaurant menu engineering expert. Analyze menu items for profitability, pricing strategy, and cost optimization. Provide specific recommendations.",
         "cost": "You are a restaurant cost analyst. Calculate food costs, suggest pricing, and identify opportunities for cost reduction while maintaining quality.",
-        "site": "You are a restaurant site analysis expert. Evaluate location potential based on demographics, foot traffic, competition, and market conditions."
+        "site": "You are a restaurant site analysis expert. Evaluate location potential based on demographics, foot traffic, competition, and market conditions.",
     }
-
     system_message = system_messages.get(data.analysis_type, "You are a helpful restaurant business assistant.")
 
-    client_ai = AsyncOpenAI(api_key=api_key)
-    completion = await client_ai.chat.completions.create(
-        model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
-        messages=[
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": data.content},
-        ],
-    )
-    response = completion.choices[0].message.content
+    try:
+        response = await chat_complete(system=system_message, user=data.content)
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     return {"analysis": response, "type": data.analysis_type}
 
 @api_router.post("/ai/cost-calculator")
 async def ai_cost_calculator(data: dict, user: User = Depends(get_current_user)):
     """AI-powered recipe cost calculator"""
-    from openai import AsyncOpenAI
-
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="AI service not configured")
+    from ai_client import chat_complete
 
     system_prompt = """You are a restaurant cost calculator. Given ingredient costs and quantities, calculate:
 1. Total recipe cost
@@ -690,15 +676,10 @@ Respond in a structured format."""
     servings = data.get("servings", 1)
     prompt = f"Calculate costs for this recipe:\n{ingredients}\nNumber of servings: {servings}"
 
-    client_ai = AsyncOpenAI(api_key=api_key)
-    completion = await client_ai.chat.completions.create(
-        model=os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt},
-        ],
-    )
-    response = completion.choices[0].message.content
+    try:
+        response = await chat_complete(system=system_prompt, user=prompt)
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     return {"calculation": response}
 
