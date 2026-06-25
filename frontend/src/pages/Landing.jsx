@@ -96,8 +96,17 @@ const Landing = ({ setUser }) => {
   };
 
   const handleOAuthLogin = () => {
-    const redirectUrl = window.location.origin + "/dashboard";
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const redirectUri = `${backendUrl}/api/auth/google/callback`;
+    const state = window.location.origin + '/dashboard';
+    const params = new URLSearchParams({
+      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      scope: 'openid email profile',
+      state,
+    });
+    window.location.href = `https://accounts.google.com/o/oauth2/auth?${params}`;
   };
 
   if (view === "login" || view === "register") {
