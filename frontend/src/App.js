@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
@@ -8,46 +8,44 @@ import { toast } from "sonner";
 // Pages
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
+import Onboarding from "@/pages/Onboarding";
+import Pricing from "@/pages/Pricing";
+import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
+import Donations from "@/pages/Donations";
+import DonationSuccess from "@/pages/DonationSuccess";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Configure axios defaults
 axios.defaults.withCredentials = true;
 
 // Auth Context
 export const AuthContext = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
 
   const checkAuth = useCallback(async () => {
-    // CRITICAL: If returning from OAuth callback, skip the /me check
-    // AuthCallback will exchange the session_id and establish the session first
     if (window.location.hash?.includes('session_id=')) {
       setLoading(false);
       return;
     }
-
     try {
       const response = await axios.get(`${API}/auth/me`);
       setUser(response.data);
-    } catch (error) {
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  useEffect(() => { checkAuth(); }, [checkAuth]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
           <p className="text-zinc-400 text-sm">Loading...</p>
         </div>
       </div>
@@ -57,63 +55,58 @@ export const AuthContext = ({ children }) => {
   return children({ user, setUser, checkAuth });
 };
 
-// Auth Callback Component
+// OAuth Callback Component
 const AuthCallback = ({ setUser }) => {
   const navigate = useNavigate();
   const hasProcessed = useRef(false);
 
   useEffect(() => {
-    // Use ref to prevent double processing in StrictMode
     if (hasProcessed.current) return;
     hasProcessed.current = true;
 
     const processAuth = async () => {
       const hash = window.location.hash;
       const sessionIdMatch = hash.match(/session_id=([^&]+)/);
-      
-      if (!sessionIdMatch) {
-        navigate('/');
-        return;
-      }
-
-      const sessionId = sessionIdMatch[1];
+      if (!sessionIdMatch) { navigate('/'); return; }
 
       try {
-        const response = await axios.post(`${API}/auth/session`, {
-          session_id: sessionId
-        });
-        
+        const response = await axios.post(`${API}/auth/session`, { session_id: sessionIdMatch[1] });
         setUser(response.data);
         toast.success(`Welcome, ${response.data.name}!`);
-        
-        // Clear hash and navigate to dashboard
         window.history.replaceState(null, '', window.location.pathname);
-        navigate('/dashboard', { state: { user: response.data } });
-      } catch (error) {
-        console.error('Auth error:', error);
+        if (response.data.onboarding_completed) {
+          navigate('/dashboard');
+        } else {
+          navigate('/onboarding');
+        }
+      } catch {
         toast.error('Authentication failed. Please try again.');
         navigate('/');
       }
     };
-
     processAuth();
   }, [navigate, setUser]);
 
   return (
     <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
         <p className="text-zinc-400 text-sm">Authenticating...</p>
       </div>
     </div>
   );
 };
 
-// App Router
+// Protected route wrapper
+const ProtectedRoute = ({ user, onboardingRequired = true, children }) => {
+  if (!user) return <Navigate to="/" replace />;
+  if (onboardingRequired && !user.onboarding_completed) return <Navigate to="/onboarding" replace />;
+  return children;
+};
+
 function AppRouter() {
   const location = useLocation();
 
-  // Check URL fragment for session_id synchronously during render
   if (location.hash?.includes('session_id=')) {
     return (
       <AuthContext>
@@ -126,14 +119,36 @@ function AppRouter() {
     <AuthContext>
       {({ user, setUser, checkAuth }) => (
         <Routes>
-          <Route 
-            path="/" 
-            element={user ? <Dashboard user={user} setUser={setUser} /> : <Landing />} 
+          <Route
+            path="/"
+            element={
+              user
+                ? user.onboarding_completed
+                  ? <Navigate to="/dashboard" replace />
+                  : <Navigate to="/onboarding" replace />
+                : <Landing setUser={setUser} />
+            }
           />
-          <Route 
-            path="/dashboard" 
-            element={user ? <Dashboard user={user} setUser={setUser} /> : <Landing />} 
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute user={user}>
+                <Dashboard user={user} setUser={setUser} />
+              </ProtectedRoute>
+            }
           />
+          <Route
+            path="/onboarding"
+            element={
+              user
+                ? <Onboarding user={user} setUser={setUser} />
+                : <Navigate to="/" replace />
+            }
+          />
+          <Route path="/pricing" element={<Pricing user={user} />} />
+          <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+          <Route path="/donate" element={<Donations user={user} />} />
+          <Route path="/donation/success" element={<DonationSuccess />} />
         </Routes>
       )}
     </AuthContext>
