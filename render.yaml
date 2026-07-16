@@ -9,8 +9,16 @@ services:
     envVars:
       - key: DB_PATH
         value: /data/restaunteur.db
-      - key: ANTHROPIC_API_KEY
+      - key: OPENAI_API_KEY
         sync: false          # set manually in Render dashboard
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: BACKEND_URL
+        sync: false          # e.g., https://restaunteur-pro-api.onrender.com
+      - key: FRONTEND_URL
+        sync: false          # e.g., https://restaunteur-pro.onrender.com
       - key: STRIPE_API_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
@@ -31,7 +39,9 @@ services:
     staticPublishPath: build
     envVars:
       - key: REACT_APP_BACKEND_URL
-        sync: false          # set to your backend Render URL e.g. https://restaunteur-pro-api.onrender.com
+        sync: false          # e.g., https://restaunteur-pro-api.onrender.com
+      - key: REACT_APP_GOOGLE_CLIENT_ID
+        sync: false          # same as backend GOOGLE_CLIENT_ID
     routes:
       - type: rewrite
         source: /*
