@@ -95,18 +95,20 @@ const Landing = ({ setUser }) => {
     }
   };
 
-  const handleOAuthLogin = () => {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
-    const redirectUri = `${backendUrl}/api/auth/google/callback`;
-    const state = window.location.origin + '/dashboard';
-    const params = new URLSearchParams({
-      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-      redirect_uri: redirectUri,
-      response_type: 'code',
-      scope: 'openid email profile',
-      state,
-    });
-    window.location.href = `https://accounts.google.com/o/oauth2/auth?${params}`;
+  const handleOAuthLogin = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API}/auth/google/init`);
+      const { auth_url } = res.data;
+      if (auth_url) {
+        window.location.href = auth_url;
+      } else {
+        toast.error("Failed to initialize OAuth");
+      }
+    } catch (err) {
+      toast.error("OAuth initialization failed");
+      setLoading(false);
+    }
   };
 
   if (view === "login" || view === "register") {

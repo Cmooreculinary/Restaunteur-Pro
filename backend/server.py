@@ -344,6 +344,11 @@ CREATE TABLE IF NOT EXISTS donations (
     created_at TEXT,
     updated_at TEXT
 );
+CREATE TABLE IF NOT EXISTS oauth_states (
+    state_nonce TEXT PRIMARY KEY,
+    expires_at TEXT,
+    created_at TEXT
+);
         """)
         await conn.commit()
 
@@ -826,35 +831,105 @@ async def login(data: LoginRequest, response: Response):
     _set_session_cookie(response, session_token)
     return {k: v for k, v in user.items() if k not in ["password_hash"]}
 
-@api_router.post("/auth/session")
-async def exchange_session(request: Request, response: Response):
-    body = await request.json()
-    session_id = body.get("session_id")
-    if not session_id:
-        raise HTTPException(status_code=400, detail="session_id required")
+@api_router.get("/auth/google/init")
+async def google_oauth_init(response: Response):
+    google_client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    if not google_client_id:
+        raise HTTPException(status_code=500, detail="Google OAuth not configured")
+
+    state_nonce = f"nonce_{uuid.uuid4().hex}"
+    expires_at = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    await db_insert("oauth_states", {
+        "state_nonce": state_nonce,
+        "expires_at": expires_at,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+
+    backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
+    redirect_uri = f"{backend_url}/api/auth/google/callback"
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+
+    auth_url = f"https://accounts.google.com/o/oauth2/auth?{str.join('&', [
+        f'client_id={google_client_id}',
+        f'redirect_uri={redirect_uri}',
+        f'response_type=code',
+        f'scope=openid email profile',
+        f'state={state_nonce}'
+    ])}"
+
+    return {"auth_url": auth_url, "state": state_nonce}
+
+@api_router.get("/auth/google/callback")
+async def google_oauth_callback(code: str, state: str, response: Response):
+    google_client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    google_client_secret = os.environ.get("GOOGLE_CLIENT_SECRET")
+    backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
+
+    if not google_client_id or not google_client_secret:
+        raise HTTPException(status_code=500, detail="Google OAuth not configured")
+
+    state_record = await db_get("oauth_states", {"state_nonce": state})
+    if not state_record:
+        raise HTTPException(status_code=400, detail="Invalid or expired state parameter")
+
+    expires_at = state_record.get("expires_at")
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="State parameter expired")
+
+    await db_delete("oauth_states", {"state_nonce": state})
 
     async with httpx.AsyncClient() as client_http:
-        resp = await client_http.get(
-            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
-            headers={"X-Session-ID": session_id}
+        token_resp = await client_http.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": code,
+                "client_id": google_client_id,
+                "client_secret": google_client_secret,
+                "redirect_uri": f"{backend_url}/api/auth/google/callback",
+                "grant_type": "authorization_code"
+            }
         )
-        if resp.status_code != 200:
-            raise HTTPException(status_code=401, detail="Invalid session_id")
-        auth_data = resp.json()
 
-    email = auth_data.get("email")
+        if token_resp.status_code != 200:
+            raise HTTPException(status_code=401, detail="Google OAuth token exchange failed")
+
+        token_data = token_resp.json()
+        access_token = token_data.get("access_token")
+
+        user_info_resp = await client_http.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+        if user_info_resp.status_code != 200:
+            raise HTTPException(status_code=401, detail="Failed to get Google user info")
+
+        google_user = user_info_resp.json()
+
+    email = google_user.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="Email not provided by Google")
+
     existing_user = await db_get("users", {"email": email})
     now = datetime.now(timezone.utc).isoformat()
 
     if existing_user:
         user_id = existing_user["user_id"]
+        await db_update("users", {"user_id": user_id}, {
+            "picture": google_user.get("picture"),
+            "updated_at": now
+        })
     else:
         user_id = f"user_{uuid.uuid4().hex[:12]}"
         new_user = {
             "user_id": user_id,
             "email": email,
-            "name": auth_data.get("name", "User"),
-            "picture": auth_data.get("picture"),
+            "name": google_user.get("name", email.split("@")[0]),
+            "picture": google_user.get("picture"),
             "onboarding_completed": False,
             "created_at": now
         }
@@ -878,17 +953,19 @@ async def exchange_session(request: Request, response: Response):
             "created_at": now
         })
 
-    session_token = auth_data.get("session_token", f"sess_{uuid.uuid4().hex}")
+    session_token = f"sess_{uuid.uuid4().hex}"
     expires_at = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
     await db_delete("user_sessions", {"user_id": user_id})
     await db_insert("user_sessions", {
-        "user_id": user_id, "session_token": session_token,
-        "expires_at": expires_at, "created_at": now
+        "user_id": user_id,
+        "session_token": session_token,
+        "expires_at": expires_at,
+        "created_at": now
     })
 
-    user = await db_get("users", {"user_id": user_id})
     _set_session_cookie(response, session_token)
-    return {k: v for k, v in user.items() if k != "password_hash"}
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+    return {"redirect_to": f"{frontend_url}/dashboard"}
 
 SECRET_ACCESS_CODE = "restaurateur2026"
 
