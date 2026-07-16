@@ -885,15 +885,15 @@ async def google_oauth_init(response: Response):
 
     backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
     redirect_uri = f"{backend_url}/api/auth/google/callback"
-    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 
-    auth_url = f"https://accounts.google.com/o/oauth2/auth?{str.join('&', [
-        f'client_id={google_client_id}',
-        f'redirect_uri={redirect_uri}',
-        f'response_type=code',
-        f'scope=openid email profile',
-        f'state={state_nonce}'
-    ])}"
+    params = "&".join([
+        f"client_id={google_client_id}",
+        f"redirect_uri={redirect_uri}",
+        "response_type=code",
+        "scope=openid email profile",
+        f"state={state_nonce}"
+    ])
+    auth_url = f"https://accounts.google.com/o/oauth2/auth?{params}"
 
     return {"auth_url": auth_url, "state": state_nonce}
 
