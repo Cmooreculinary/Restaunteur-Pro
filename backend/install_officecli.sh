@@ -12,7 +12,7 @@ fi
 
 installed=false
 
-if command -v curl >/dev/null 2>&2; then
+if command -v curl >/dev/null 2>&1; then
   echo "Installing OfficeCLI with the official iOfficeAI installer..."
   if curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash; then
     officecli --version || true
