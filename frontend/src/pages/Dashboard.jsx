@@ -321,7 +321,7 @@ const Dashboard = ({ user, setUser }) => {
               Create Project
             </Button>
           </div>
-        )}
+        ) : null}
       </main>
     </div>
   );
