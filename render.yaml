@@ -4,7 +4,7 @@ services:
     name: restaunteur-pro-api
     runtime: python
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && ./install_officecli.sh
     startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DB_PATH

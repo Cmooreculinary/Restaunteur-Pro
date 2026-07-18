@@ -15,6 +15,8 @@ from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone, timedelta
 import httpx
+import shutil
+import subprocess
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -1750,7 +1752,25 @@ async def root():
 
 @api_router.get("/health")
 async def health():
-    return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+    officecli_path = shutil.which("officecli")
+    officecli = {"installed": bool(officecli_path), "path": officecli_path}
+    if officecli_path:
+        try:
+            result = subprocess.run(
+                [officecli_path, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
+            )
+            officecli["version"] = (result.stdout or result.stderr).strip()
+        except Exception as exc:
+            officecli["version_error"] = str(exc)
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "integrations": {"officecli": officecli},
+    }
 
 # ==================== MIDDLEWARE & STARTUP ====================
 
