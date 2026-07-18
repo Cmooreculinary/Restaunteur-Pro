@@ -1,4 +1,4 @@
-import { getAccessToken, setAccessToken } from "./App";
+import { getAccessToken, setAccessToken } from "./lib/sessionAuth";
 
 
 describe("session bearer storage", () => {
