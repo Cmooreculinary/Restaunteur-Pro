@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 import { Toaster } from "@/components/ui/sonner";
+import { getAccessToken, setAccessToken } from "@/lib/sessionAuth";
 
 // Pages
 import Landing from "@/pages/Landing";
@@ -13,8 +14,6 @@ import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import Donations from "@/pages/Donations";
 import DonationSuccess from "@/pages/DonationSuccess";
 
-const TOKEN_KEY = "restaurateur-pro-access-token";
-
 const normalizeBackendUrl = (value) => {
   const candidate = (value || "http://localhost:8000").trim().replace(/\/$/, "");
   if (/^https?:\/\//i.test(candidate)) return candidate;
@@ -23,23 +22,6 @@ const normalizeBackendUrl = (value) => {
 
 const BACKEND_URL = normalizeBackendUrl(process.env.REACT_APP_BACKEND_URL);
 const API = `${BACKEND_URL}/api`;
-
-export const getAccessToken = () => {
-  try {
-    return window.sessionStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
-  }
-};
-
-export const setAccessToken = (token) => {
-  try {
-    if (token) window.sessionStorage.setItem(TOKEN_KEY, token);
-    else window.sessionStorage.removeItem(TOKEN_KEY);
-  } catch {
-    // Storage may be unavailable in hardened/private browser contexts.
-  }
-};
 
 const captureOAuthToken = () => {
   const hash = window.location.hash?.replace(/^#/, "");
@@ -108,7 +90,6 @@ export const AuthContext = ({ children }) => {
   return children({ user, setUser, checkAuth });
 };
 
-// Protected route wrapper
 const ProtectedRoute = ({ user, onboardingRequired = true, children }) => {
   if (!user) return <Navigate to="/" replace />;
   if (onboardingRequired && !user.onboarding_completed) {
@@ -118,8 +99,6 @@ const ProtectedRoute = ({ user, onboardingRequired = true, children }) => {
 };
 
 function AppRouter() {
-  useLocation();
-
   return (
     <AuthContext>
       {({ user, setUser }) => (
