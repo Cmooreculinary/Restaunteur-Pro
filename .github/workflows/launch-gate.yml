@@ -23,12 +23,14 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: pip install -r requirements.txt
       - run: python -m py_compile server.py app.py
-      - run: pytest -q --junitxml=pytest-results.xml
+      - run: python -m pytest -q --junitxml=pytest-results.xml 2>&1 | tee pytest.log
       - if: always()
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
-          path: backend/pytest-results.xml
+          path: |
+            backend/pytest-results.xml
+            backend/pytest.log
           if-no-files-found: ignore
 
   frontend:
@@ -45,10 +47,12 @@ jobs:
           cache-dependency-path: frontend/yarn.lock
       - run: yarn install --frozen-lockfile
       - run: CI=true yarn test --watchAll=false --runInBand --json --outputFile=test-results.json
+      - run: yarn build 2>&1 | tee build.log
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-test-results
-          path: frontend/test-results.json
+          name: frontend-diagnostics
+          path: |
+            frontend/test-results.json
+            frontend/build.log
           if-no-files-found: ignore
-      - run: yarn build
