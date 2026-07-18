@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
 
 // Pages
 import Landing from "@/pages/Landing";
@@ -14,10 +13,65 @@ import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import Donations from "@/pages/Donations";
 import DonationSuccess from "@/pages/DonationSuccess";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const TOKEN_KEY = "restaurateur-pro-access-token";
+
+const normalizeBackendUrl = (value) => {
+  const candidate = (value || "http://localhost:8000").trim().replace(/\/$/, "");
+  if (/^https?:\/\//i.test(candidate)) return candidate;
+  return `https://${candidate}`;
+};
+
+const BACKEND_URL = normalizeBackendUrl(process.env.REACT_APP_BACKEND_URL);
 const API = `${BACKEND_URL}/api`;
 
+export const getAccessToken = () => {
+  try {
+    return window.sessionStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+};
+
+export const setAccessToken = (token) => {
+  try {
+    if (token) window.sessionStorage.setItem(TOKEN_KEY, token);
+    else window.sessionStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // Storage may be unavailable in hardened/private browser contexts.
+  }
+};
+
+const captureOAuthToken = () => {
+  const hash = window.location.hash?.replace(/^#/, "");
+  if (!hash) return null;
+  const token = new URLSearchParams(hash).get("access_token");
+  if (!token) return null;
+  setAccessToken(token);
+  window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+  return token;
+};
+
 axios.defaults.withCredentials = true;
+axios.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+axios.interceptors.response.use(
+  (response) => {
+    const returnedToken = response.data?.access_token;
+    if (returnedToken) setAccessToken(returnedToken);
+    if (response.config?.url?.includes("/auth/logout")) setAccessToken(null);
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) setAccessToken(null);
+    return Promise.reject(error);
+  }
+);
 
 // Auth Context
 export const AuthContext = ({ children }) => {
@@ -25,10 +79,7 @@ export const AuthContext = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
-    if (window.location.hash?.includes('session_id=')) {
-      setLoading(false);
-      return;
-    }
+    captureOAuthToken();
     try {
       const response = await axios.get(`${API}/auth/me`);
       setUser(response.data);
@@ -39,7 +90,9 @@ export const AuthContext = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => { checkAuth(); }, [checkAuth]);
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   if (loading) {
     return (
@@ -55,69 +108,21 @@ export const AuthContext = ({ children }) => {
   return children({ user, setUser, checkAuth });
 };
 
-// OAuth Callback Component
-const AuthCallback = ({ setUser }) => {
-  const navigate = useNavigate();
-  const hasProcessed = useRef(false);
-
-  useEffect(() => {
-    if (hasProcessed.current) return;
-    hasProcessed.current = true;
-
-    const processAuth = async () => {
-      const hash = window.location.hash;
-      const sessionIdMatch = hash.match(/session_id=([^&]+)/);
-      if (!sessionIdMatch) { navigate('/'); return; }
-
-      try {
-        const response = await axios.post(`${API}/auth/session`, { session_id: sessionIdMatch[1] });
-        setUser(response.data);
-        toast.success(`Welcome, ${response.data.name}!`);
-        window.history.replaceState(null, '', window.location.pathname);
-        if (response.data.onboarding_completed) {
-          navigate('/dashboard');
-        } else {
-          navigate('/onboarding');
-        }
-      } catch {
-        toast.error('Authentication failed. Please try again.');
-        navigate('/');
-      }
-    };
-    processAuth();
-  }, [navigate, setUser]);
-
-  return (
-    <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
-        <p className="text-zinc-400 text-sm">Authenticating...</p>
-      </div>
-    </div>
-  );
-};
-
 // Protected route wrapper
 const ProtectedRoute = ({ user, onboardingRequired = true, children }) => {
   if (!user) return <Navigate to="/" replace />;
-  if (onboardingRequired && !user.onboarding_completed) return <Navigate to="/onboarding" replace />;
+  if (onboardingRequired && !user.onboarding_completed) {
+    return <Navigate to="/onboarding" replace />;
+  }
   return children;
 };
 
 function AppRouter() {
-  const location = useLocation();
-
-  if (location.hash?.includes('session_id=')) {
-    return (
-      <AuthContext>
-        {({ setUser }) => <AuthCallback setUser={setUser} />}
-      </AuthContext>
-    );
-  }
+  useLocation();
 
   return (
     <AuthContext>
-      {({ user, setUser, checkAuth }) => (
+      {({ user, setUser }) => (
         <Routes>
           <Route
             path="/"
@@ -149,6 +154,7 @@ function AppRouter() {
           <Route path="/subscription/success" element={<SubscriptionSuccess />} />
           <Route path="/donate" element={<Donations user={user} />} />
           <Route path="/donation/success" element={<DonationSuccess />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       )}
     </AuthContext>
