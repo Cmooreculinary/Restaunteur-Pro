@@ -95,9 +95,20 @@ const Landing = ({ setUser }) => {
     }
   };
 
-  const handleOAuthLogin = () => {
-    const redirectUrl = window.location.origin + "/dashboard";
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+  const handleOAuthLogin = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API}/auth/google/init`);
+      const { auth_url } = res.data;
+      if (auth_url) {
+        window.location.href = auth_url;
+      } else {
+        toast.error("Failed to initialize OAuth");
+      }
+    } catch (err) {
+      toast.error("OAuth initialization failed");
+      setLoading(false);
+    }
   };
 
   if (view === "login" || view === "register") {

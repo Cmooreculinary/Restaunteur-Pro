@@ -346,6 +346,49 @@ CREATE TABLE IF NOT EXISTS donations (
     created_at TEXT,
     updated_at TEXT
 );
+CREATE TABLE IF NOT EXISTS oauth_states (
+    state_nonce TEXT PRIMARY KEY,
+    expires_at TEXT,
+    created_at TEXT
+);
+CREATE TABLE IF NOT EXISTS ap_invoices (
+    invoice_id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    vendor_id TEXT,
+    vendor_name TEXT,
+    invoice_number TEXT,
+    total REAL DEFAULT 0,
+    status TEXT DEFAULT 'uploaded',
+    confidence_score REAL DEFAULT 0,
+    due_date TEXT,
+    invoice_date TEXT,
+    payment_priority INTEGER DEFAULT 2,
+    created_at TEXT,
+    updated_at TEXT
+);
+CREATE TABLE IF NOT EXISTS ap_vendors (
+    vendor_id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    category TEXT,
+    payment_terms TEXT,
+    reliability_score REAL DEFAULT 85,
+    contact_name TEXT DEFAULT '',
+    contact_email TEXT DEFAULT '',
+    contact_phone TEXT DEFAULT '',
+    created_at TEXT
+);
+CREATE TABLE IF NOT EXISTS ap_alerts (
+    alert_id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    alert_type TEXT,
+    vendor_name TEXT,
+    message TEXT,
+    severity TEXT DEFAULT 'warning',
+    resolved INTEGER DEFAULT 0,
+    resolved_at TEXT,
+    created_at TEXT
+);
         """)
         await conn.commit()
 
@@ -828,35 +871,105 @@ async def login(data: LoginRequest, response: Response):
     _set_session_cookie(response, session_token)
     return {k: v for k, v in user.items() if k not in ["password_hash"]}
 
-@api_router.post("/auth/session")
-async def exchange_session(request: Request, response: Response):
-    body = await request.json()
-    session_id = body.get("session_id")
-    if not session_id:
-        raise HTTPException(status_code=400, detail="session_id required")
+@api_router.get("/auth/google/init")
+async def google_oauth_init(response: Response):
+    google_client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    if not google_client_id:
+        raise HTTPException(status_code=500, detail="Google OAuth not configured")
+
+    state_nonce = f"nonce_{uuid.uuid4().hex}"
+    expires_at = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    await db_insert("oauth_states", {
+        "state_nonce": state_nonce,
+        "expires_at": expires_at,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+
+    backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
+    redirect_uri = f"{backend_url}/api/auth/google/callback"
+
+    params = "&".join([
+        f"client_id={google_client_id}",
+        f"redirect_uri={redirect_uri}",
+        "response_type=code",
+        "scope=openid email profile",
+        f"state={state_nonce}"
+    ])
+    auth_url = f"https://accounts.google.com/o/oauth2/auth?{params}"
+
+    return {"auth_url": auth_url, "state": state_nonce}
+
+@api_router.get("/auth/google/callback")
+async def google_oauth_callback(code: str, state: str, response: Response):
+    google_client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    google_client_secret = os.environ.get("GOOGLE_CLIENT_SECRET")
+    backend_url = os.environ.get("BACKEND_URL", "http://localhost:8000")
+
+    if not google_client_id or not google_client_secret:
+        raise HTTPException(status_code=500, detail="Google OAuth not configured")
+
+    state_record = await db_get("oauth_states", {"state_nonce": state})
+    if not state_record:
+        raise HTTPException(status_code=400, detail="Invalid or expired state parameter")
+
+    expires_at = state_record.get("expires_at")
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="State parameter expired")
+
+    await db_delete("oauth_states", {"state_nonce": state})
 
     async with httpx.AsyncClient() as client_http:
-        resp = await client_http.get(
-            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
-            headers={"X-Session-ID": session_id}
+        token_resp = await client_http.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": code,
+                "client_id": google_client_id,
+                "client_secret": google_client_secret,
+                "redirect_uri": f"{backend_url}/api/auth/google/callback",
+                "grant_type": "authorization_code"
+            }
         )
-        if resp.status_code != 200:
-            raise HTTPException(status_code=401, detail="Invalid session_id")
-        auth_data = resp.json()
 
-    email = auth_data.get("email")
+        if token_resp.status_code != 200:
+            raise HTTPException(status_code=401, detail="Google OAuth token exchange failed")
+
+        token_data = token_resp.json()
+        access_token = token_data.get("access_token")
+
+        user_info_resp = await client_http.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+        if user_info_resp.status_code != 200:
+            raise HTTPException(status_code=401, detail="Failed to get Google user info")
+
+        google_user = user_info_resp.json()
+
+    email = google_user.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="Email not provided by Google")
+
     existing_user = await db_get("users", {"email": email})
     now = datetime.now(timezone.utc).isoformat()
 
     if existing_user:
         user_id = existing_user["user_id"]
+        await db_update("users", {"user_id": user_id}, {
+            "picture": google_user.get("picture"),
+            "updated_at": now
+        })
     else:
         user_id = f"user_{uuid.uuid4().hex[:12]}"
         new_user = {
             "user_id": user_id,
             "email": email,
-            "name": auth_data.get("name", "User"),
-            "picture": auth_data.get("picture"),
+            "name": google_user.get("name", email.split("@")[0]),
+            "picture": google_user.get("picture"),
             "onboarding_completed": False,
             "created_at": now
         }
@@ -880,17 +993,19 @@ async def exchange_session(request: Request, response: Response):
             "created_at": now
         })
 
-    session_token = auth_data.get("session_token", f"sess_{uuid.uuid4().hex}")
+    session_token = f"sess_{uuid.uuid4().hex}"
     expires_at = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
     await db_delete("user_sessions", {"user_id": user_id})
     await db_insert("user_sessions", {
-        "user_id": user_id, "session_token": session_token,
-        "expires_at": expires_at, "created_at": now
+        "user_id": user_id,
+        "session_token": session_token,
+        "expires_at": expires_at,
+        "created_at": now
     })
 
-    user = await db_get("users", {"user_id": user_id})
     _set_session_cookie(response, session_token)
-    return {k: v for k, v in user.items() if k != "password_hash"}
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+    return {"redirect_to": f"{frontend_url}/dashboard"}
 
 SECRET_ACCESS_CODE = "restaurateur2026"
 
@@ -1743,6 +1858,279 @@ async def get_donation_status(session_id: str):
         return {"status": session.status, "payment_status": session.payment_status, "amount": session.amount_total}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ==================== AP INTELLIGENCE ENDPOINTS ====================
+
+@api_router.get("/ap/dashboard")
+async def get_ap_dashboard(user: User = Depends(get_current_user)):
+    now = datetime.now(timezone.utc)
+    week_ago = (now - timedelta(days=7)).isoformat()
+
+    invoices = await db_list("ap_invoices", {"user_id": user.user_id})
+    alerts = await db_list("ap_alerts", {"user_id": user.user_id})
+
+    unpaid = sum(i.get("total", 0) for i in invoices if i.get("status") in ["pending_approval", "approved", "scheduled_for_payment"])
+    pending_review = sum(i.get("total", 0) for i in invoices if i.get("status") == "needs_review")
+    recent_invoices = sorted(invoices, key=lambda x: x.get("created_at", ""), reverse=True)[:5]
+    largest_invoices = sorted(invoices, key=lambda x: x.get("total", 0), reverse=True)[:3]
+
+    return {
+        "total_unpaid": unpaid,
+        "invoice_count": len(invoices),
+        "pending_review_count": len([i for i in invoices if i.get("status") == "needs_review"]),
+        "pending_approval_count": len([i for i in invoices if i.get("status") == "pending_approval"]),
+        "vendor_count": len(await db_list("ap_vendors", {"user_id": user.user_id})),
+        "total_alert_count": len(alerts),
+        "price_alert_count": len([a for a in alerts if a.get("alert_type") == "price_increase"]),
+        "duplicate_alert_count": len([a for a in alerts if a.get("alert_type") == "duplicate"]),
+        "cash_pressure_score": 45 + int((unpaid % 100) / 2),
+        "food_cost_risk_score": 35 + int((len(invoices) % 100) / 2),
+        "alerts": alerts[:10],
+        "recent_invoices": recent_invoices,
+        "largest_invoices": largest_invoices,
+    }
+
+@api_router.get("/ap/invoices")
+async def get_ap_invoices(user: User = Depends(get_current_user)):
+    return await db_list("ap_invoices", {"user_id": user.user_id}, limit=500)
+
+@api_router.post("/ap/invoices")
+async def create_ap_invoice(data: dict, user: User = Depends(get_current_user)):
+    invoice_id = f"inv_{uuid.uuid4().hex[:12]}"
+    now = datetime.now(timezone.utc).isoformat()
+    invoice = {
+        "invoice_id": invoice_id,
+        "user_id": user.user_id,
+        "vendor_id": data.get("vendor_id"),
+        "vendor_name": data.get("vendor_name", ""),
+        "invoice_number": data.get("invoice_number", ""),
+        "total": data.get("total", 0),
+        "status": "uploaded",
+        "confidence_score": data.get("confidence_score", 0.85),
+        "due_date": data.get("due_date", ""),
+        "invoice_date": data.get("invoice_date", ""),
+        "payment_priority": data.get("payment_priority", 2),
+        "created_at": now,
+        "updated_at": now
+    }
+    await db_insert("ap_invoices", invoice)
+    return invoice
+
+@api_router.get("/ap/vendors")
+async def get_ap_vendors(user: User = Depends(get_current_user)):
+    return await db_list("ap_vendors", {"user_id": user.user_id}, limit=500)
+
+@api_router.post("/ap/vendors")
+async def create_ap_vendor(data: dict, user: User = Depends(get_current_user)):
+    vendor_id = f"vnd_{uuid.uuid4().hex[:12]}"
+    vendor = {
+        "vendor_id": vendor_id,
+        "user_id": user.user_id,
+        "name": data.get("name", ""),
+        "category": data.get("category", ""),
+        "payment_terms": data.get("payment_terms", ""),
+        "reliability_score": data.get("reliability_score", 85),
+        "contact_name": data.get("contact_name", ""),
+        "contact_email": data.get("contact_email", ""),
+        "contact_phone": data.get("contact_phone", ""),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db_insert("ap_vendors", vendor)
+    return vendor
+
+@api_router.get("/ap/alerts")
+async def get_ap_alerts(user: User = Depends(get_current_user)):
+    return await db_list("ap_alerts", {"user_id": user.user_id}, limit=500)
+
+@api_router.put("/ap/alerts/{alert_id}/resolve")
+async def resolve_ap_alert(alert_id: str, user: User = Depends(get_current_user)):
+    alert = await db_get("ap_alerts", {"alert_id": alert_id})
+    if not alert or alert.get("user_id") != user.user_id:
+        raise HTTPException(status_code=404, detail="Alert not found")
+
+    await db_update("ap_alerts", {"alert_id": alert_id, "user_id": user.user_id}, {
+        "resolved": True,
+        "resolved_at": datetime.now(timezone.utc).isoformat()
+    })
+    return await db_get("ap_alerts", {"alert_id": alert_id, "user_id": user.user_id})
+
+@api_router.get("/ap/approvals")
+async def get_ap_approvals(user: User = Depends(get_current_user)):
+    return await db_list("ap_invoices", {"user_id": user.user_id, "status": "pending_approval"}, limit=500)
+
+@api_router.get("/ap/cash-flow")
+async def get_ap_cashflow(user: User = Depends(get_current_user)):
+    invoices = await db_list("ap_invoices", {"user_id": user.user_id})
+    today = datetime.now(timezone.utc).date()
+
+    weekly_data = {}
+    for i in range(4):
+        week_start = today + timedelta(days=i * 7)
+        week_key = week_start.isoformat()
+        weekly_data[week_key] = {"week": week_key, "due": 0, "scheduled": 0}
+
+    for invoice in invoices:
+        due_date_str = invoice.get("due_date", "")
+        if due_date_str:
+            try:
+                due_date = datetime.fromisoformat(due_date_str.replace("Z", "+00:00")).date()
+                days_until_due = (due_date - today).days
+                if 0 <= days_until_due < 28:
+                    week_idx = days_until_due // 7
+                    week_start = today + timedelta(days=week_idx * 7)
+                    week_key = week_start.isoformat()
+                    if week_key in weekly_data:
+                        total = invoice.get("total", 0)
+                        if invoice.get("status") == "scheduled_for_payment":
+                            weekly_data[week_key]["scheduled"] += total
+                        elif invoice.get("status") == "approved":
+                            weekly_data[week_key]["due"] += total
+            except (ValueError, AttributeError):
+                pass
+
+    return list(weekly_data.values())
+
+@api_router.post("/ap/invoices/{invoice_id}/action")
+async def invoice_action(invoice_id: str, data: dict, user: User = Depends(get_current_user)):
+    invoice = await db_get("ap_invoices", {"invoice_id": invoice_id})
+    if not invoice or invoice.get("user_id") != user.user_id:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+
+    action = data.get("action", "")
+    status_map = {
+        "approve": "approved",
+        "reject": "rejected",
+        "schedule": "scheduled_for_payment",
+        "pay": "paid",
+        "review": "needs_review",
+    }
+    new_status = status_map.get(action)
+    if not new_status:
+        raise HTTPException(status_code=400, detail="Invalid action")
+
+    await db_update("ap_invoices",
+        {"invoice_id": invoice_id, "user_id": user.user_id},
+        {"status": new_status, "updated_at": datetime.now(timezone.utc).isoformat()}
+    )
+    return await db_get("ap_invoices", {"invoice_id": invoice_id, "user_id": user.user_id})
+
+@api_router.post("/ap/ai-insights")
+async def get_ap_ai_insights(data: dict, user: User = Depends(get_current_user)):
+    context = data.get("context", "")
+    openai_key = os.environ.get("OPENAI_API_KEY")
+    if not openai_key:
+        raise HTTPException(status_code=500, detail="OpenAI not configured")
+
+    try:
+        from openai import AsyncOpenAI
+        client = AsyncOpenAI(api_key=openai_key)
+
+        invoices = await db_list("ap_invoices", {"user_id": user.user_id})
+        vendors = await db_list("ap_vendors", {"user_id": user.user_id})
+
+        prompt = f"""As a restaurant financial advisor, analyze this AP data and provide insights:
+Context: {context}
+Total unpaid: ${sum(i.get('total', 0) for i in invoices if i.get('status') in ['pending_approval', 'approved', 'scheduled_for_payment'])}
+Invoice count: {len(invoices)}
+Vendor count: {len(vendors)}
+
+Provide 2-3 actionable insights in JSON format with 'insight' and 'priority' fields."""
+
+        response = await client.messages.create(
+            model="gpt-4o",
+            max_tokens=300,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        response_text = response.content[0].text
+        return {
+            "insights": response_text,
+            "context": context,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"AI insights error: {e}")
+        return {
+            "insights": "Unable to generate insights at this time. Focus on reviewing pending invoices and consolidating vendors.",
+            "context": context,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+
+@api_router.post("/ap/seed")
+async def seed_ap_data(user: User = Depends(get_current_user)):
+    now = datetime.now(timezone.utc).isoformat()
+
+    vendors = [
+        {"name": "Sysco Foods", "category": "dry_goods", "payment_terms": "net_30", "reliability_score": 92},
+        {"name": "US Foods", "category": "produce", "payment_terms": "net_15", "reliability_score": 88},
+        {"name": "Prime Meats Inc.", "category": "meat", "payment_terms": "net_30", "reliability_score": 95},
+        {"name": "Pacific Seafood", "category": "seafood", "payment_terms": "cod", "reliability_score": 89},
+        {"name": "Local Farms Co-op", "category": "produce", "payment_terms": "cash", "reliability_score": 85},
+        {"name": "Continental Beverage", "category": "beverage", "payment_terms": "net_45", "reliability_score": 91},
+    ]
+
+    for v in vendors:
+        vendor_id = f"vnd_{uuid.uuid4().hex[:12]}"
+        await db_insert("ap_vendors", {
+            "vendor_id": vendor_id,
+            "user_id": user.user_id,
+            "name": v["name"],
+            "category": v["category"],
+            "payment_terms": v["payment_terms"],
+            "reliability_score": v["reliability_score"],
+            "contact_name": "John Doe",
+            "contact_email": "contact@vendor.com",
+            "contact_phone": "555-0000",
+            "created_at": now
+        })
+
+    invoices = [
+        {"vendor": "Sysco Foods", "invoice_num": "SYS-2024-8821", "total": 3892.50, "status": "pending_approval", "due": "2024-12-30"},
+        {"vendor": "US Foods", "invoice_num": "USF-44291", "total": 1254.00, "status": "needs_review", "due": "2024-12-17"},
+        {"vendor": "Prime Meats Inc.", "invoice_num": "PMI-9041", "total": 2890.00, "status": "approved", "due": "2024-12-24"},
+        {"vendor": "Pacific Seafood", "invoice_num": "PAC-2891", "total": 1680.00, "status": "approved", "due": "2024-12-09"},
+        {"vendor": "Sysco Foods", "invoice_num": "SYS-2024-8756", "total": 4175.00, "status": "paid", "due": "2024-12-28"},
+        {"vendor": "Local Farms Co-op", "invoice_num": "LF-0441", "total": 620.00, "status": "uploaded", "due": "2024-12-10"},
+        {"vendor": "Continental Beverage", "invoice_num": "CB-1129", "total": 1890.00, "status": "pending_approval", "due": "2025-01-02"},
+    ]
+
+    for inv in invoices:
+        invoice_id = f"inv_{uuid.uuid4().hex[:12]}"
+        await db_insert("ap_invoices", {
+            "invoice_id": invoice_id,
+            "user_id": user.user_id,
+            "vendor_name": inv["vendor"],
+            "invoice_number": inv["invoice_num"],
+            "total": inv["total"],
+            "status": inv["status"],
+            "confidence_score": 0.85 + (0.14 * (hash(inv["invoice_num"]) % 100 / 100)),
+            "due_date": inv["due"],
+            "invoice_date": (datetime.fromisoformat(inv["due"]) - timedelta(days=25)).isoformat(),
+            "payment_priority": 2,
+            "created_at": now,
+            "updated_at": now
+        })
+
+    alerts = [
+        {"type": "price_increase", "vendor": "Sysco Foods", "message": "Produce prices increased 8% last week"},
+        {"type": "payment_due", "vendor": "Pacific Seafood", "message": "Payment due tomorrow"},
+        {"type": "fraud_risk", "vendor": "US Foods", "message": "Invoice amount 3x higher than usual"},
+        {"type": "duplicate", "vendor": "Prime Meats Inc.", "message": "Potential duplicate invoice detected"},
+    ]
+
+    for alert in alerts:
+        alert_id = f"alert_{uuid.uuid4().hex[:12]}"
+        await db_insert("ap_alerts", {
+            "alert_id": alert_id,
+            "user_id": user.user_id,
+            "alert_type": alert["type"],
+            "vendor_name": alert["vendor"],
+            "message": alert["message"],
+            "severity": "warning" if alert["type"] != "fraud_risk" else "error",
+            "resolved": False,
+            "created_at": now
+        })
+
+    return {"seeded": True, "vendors": len(vendors), "invoices": len(invoices), "alerts": len(alerts)}
 
 # ==================== HEALTH CHECK ====================
 

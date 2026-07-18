@@ -1,6 +1,4 @@
-// craco.config.js
 const path = require("path");
-require("dotenv").config();
 
 // Environment variable overrides
 const config = {
@@ -30,27 +28,13 @@ let webpackConfig = {
   },
   webpack: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      "@": path.resolve(__dirname, "src"),
     },
     configure: (webpackConfig) => {
-
-      // Add ignored patterns to reduce watched directories
-        webpackConfig.watchOptions = {
-          ...webpackConfig.watchOptions,
-          ignored: [
-            '**/node_modules/**',
-            '**/.git/**',
-            '**/build/**',
-            '**/dist/**',
-            '**/coverage/**',
-            '**/public/**',
-        ],
+      webpackConfig.watchOptions = {
+        ...webpackConfig.watchOptions,
+        ignored: ["**/node_modules/**", "**/.git/**", "**/build/**", "**/dist/**"],
       };
-
-      // Add health check plugin to webpack if enabled
-      if (config.enableHealthCheck && healthPluginInstance) {
-        webpackConfig.plugins.push(healthPluginInstance);
-      }
       return webpackConfig;
     },
   },
