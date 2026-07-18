@@ -1,24 +1,40 @@
 services:
-  # ── Backend API ──────────────────────────────────────────────────────────────
   - type: web
     name: restaunteur-pro-api
     runtime: python
+    plan: starter
     rootDir: backend
-    buildCommand: pip install -r requirements.txt && ./install_officecli.sh
-    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt && (./install_officecli.sh || echo "OfficeCLI optional install skipped")
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
       - key: DB_PATH
         value: /data/restaunteur.db
+      - key: FRONTEND_URL
+        fromService:
+          name: restaunteur-pro-frontend
+          type: web
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
+      - key: CORS_ORIGINS
+        fromService:
+          name: restaunteur-pro-frontend
+          type: web
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
       - key: OPENAI_API_KEY
-        sync: false          # set manually in Render dashboard
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
-      - key: BACKEND_URL
-        sync: false          # e.g., https://restaunteur-pro-api.onrender.com
-      - key: FRONTEND_URL
-        sync: false          # e.g., https://restaunteur-pro.onrender.com
+      - key: ADMIN_ACCESS_CODE
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
       - key: STRIPE_API_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
@@ -27,23 +43,25 @@ services:
       name: restaunteur-data
       mountPath: /data
       sizeGB: 1
-    healthCheckPath: /api/health
-    autoDeploy: true
 
-  # ── Frontend (Static Site) ───────────────────────────────────────────────────
   - type: web
     name: restaunteur-pro-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: yarn install && yarn build
+    buildCommand: yarn install --frozen-lockfile && yarn build
     staticPublishPath: build
+    autoDeploy: true
     envVars:
+      - key: NODE_VERSION
+        value: "20"
       - key: REACT_APP_BACKEND_URL
-        sync: false          # e.g., https://restaunteur-pro-api.onrender.com
+        fromService:
+          name: restaunteur-pro-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
       - key: REACT_APP_GOOGLE_CLIENT_ID
-        sync: false          # same as backend GOOGLE_CLIENT_ID
+        sync: false
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-    autoDeploy: true
