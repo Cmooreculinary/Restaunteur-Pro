@@ -30,6 +30,7 @@ import ExpansionToolkit from "@/components/modules/ExpansionToolkit";
 import LeaseNegotiation from "@/components/modules/LeaseNegotiation";
 import MarketeerAgent from "@/components/modules/MarketeerAgent";
 import APIntelligence from "@/components/modules/APIntelligence";
+import ProjectWizard from "@/components/ProjectWizard";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -41,19 +42,28 @@ const Dashboard = ({ user, setUser }) => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showWizard, setShowWizard] = useState(false);
 
   // Fetch projects
   const fetchProjects = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/projects`);
       setProjects(response.data);
-      if (response.data.length > 0 && !activeProject) {
-        setActiveProject(response.data[0]);
+      if (response.data.length > 0) {
+        setActiveProject((prev) => {
+          if (prev) {
+            const stillExists = response.data.find((p) => p.project_id === prev.project_id);
+            return stillExists || response.data[0];
+          }
+          return response.data[0];
+        });
+      } else {
+        setActiveProject(null);
       }
     } catch (error) {
       console.error("Error fetching projects:", error);
     }
-  }, [activeProject]);
+  }, []);
 
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
@@ -91,6 +101,12 @@ const Dashboard = ({ user, setUser }) => {
     }
   };
 
+  const handleProjectCreated = (project) => {
+    setProjects((prev) => [project, ...prev]);
+    setActiveProject(project);
+    setActiveTab("command");
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const modules = [
@@ -107,12 +123,12 @@ const Dashboard = ({ user, setUser }) => {
   return (
     <div className="min-h-screen bg-[#0f0f10]">
       {/* Top Navigation */}
-      <header className="sticky top-0 z-50 bg-[#0f0f10]/95 backdrop-blur-md border-b border-zinc-800/50">
+      <header className="sticky top-0 z-50 bg-[#0f0f10]/90 backdrop-blur-xl border-b border-zinc-800/50">
         <div className="flex items-center justify-between px-6 py-3">
           {/* Logo & Brand */}
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#d4af37] flex items-center justify-center">
+              <div className="w-9 h-9 rounded-lg bg-[#d4af37] flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.25)]">
                 <ChefHat className="w-5 h-5 text-zinc-900" />
               </div>
               <span className="text-lg font-heading font-bold text-zinc-100 hidden md:block">
@@ -121,15 +137,15 @@ const Dashboard = ({ user, setUser }) => {
             </div>
 
             {/* Module Tabs */}
-            <nav className="hidden lg:flex items-center gap-1 bg-zinc-900/50 p-1 rounded-lg">
+            <nav className="hidden lg:flex items-center gap-1 bg-zinc-900/60 p-1 rounded-xl border border-zinc-800/40">
               {modules.map((module) => (
                 <button
                   key={module.id}
                   data-testid={`tab-${module.id}`}
                   onClick={() => setActiveTab(module.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                     activeTab === module.id
-                      ? "bg-zinc-800 text-zinc-100"
+                      ? "bg-zinc-800 text-zinc-100 shadow-sm"
                       : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
                   }`}
                 >
@@ -141,7 +157,35 @@ const Dashboard = ({ user, setUser }) => {
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Project selector + New */}
+            <div className="hidden md:flex items-center gap-2">
+              {projects.length > 0 && (
+                <select
+                  value={activeProject?.project_id || ""}
+                  onChange={(e) => {
+                    const p = projects.find((x) => x.project_id === e.target.value);
+                    if (p) setActiveProject(p);
+                  }}
+                  className="bg-zinc-900 border border-zinc-800 text-zinc-200 text-sm rounded-lg px-3 py-2 max-w-[180px] focus:outline-none focus:border-zinc-600"
+                >
+                  {projects.map((p) => (
+                    <option key={p.project_id} value={p.project_id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <Button
+                size="sm"
+                onClick={() => setShowWizard(true)}
+                className="bg-[#d4af37]/15 text-[#d4af37] hover:bg-[#d4af37]/25 border border-[#d4af37]/20"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                New
+              </Button>
+            </div>
+
             {/* Search */}
             <div className="hidden md:flex relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
@@ -150,7 +194,7 @@ const Dashboard = ({ user, setUser }) => {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-64 pl-9 bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-700"
+                className="w-48 pl-9 bg-zinc-900/80 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-700"
               />
             </div>
 
@@ -176,9 +220,8 @@ const Dashboard = ({ user, setUser }) => {
                 )}
               </Button>
 
-              {/* Notifications Dropdown */}
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl overflow-hidden z-50">
+                <div className="absolute right-0 mt-2 w-80 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
                     <span className="font-medium text-zinc-100">Notifications</span>
                     <Button
@@ -266,7 +309,7 @@ const Dashboard = ({ user, setUser }) => {
                 key={module.id}
                 data-testid={`mobile-tab-${module.id}`}
                 onClick={() => setActiveTab(module.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                   activeTab === module.id
                     ? "bg-zinc-800 text-zinc-100"
                     : "text-zinc-400 hover:text-zinc-200"
@@ -282,7 +325,6 @@ const Dashboard = ({ user, setUser }) => {
 
       {/* Main Content */}
       <main className="p-6">
-        {/* Marketeer Agent & AP Intelligence work without a project */}
         {activeTab === "marketeer" && <MarketeerAgent />}
         {activeTab === "ap" && <APIntelligence />}
 
@@ -308,24 +350,33 @@ const Dashboard = ({ user, setUser }) => {
             )}
           </>
         ) : activeTab !== "marketeer" && activeTab !== "ap" ? (
-          <div className="flex flex-col items-center justify-center h-96 text-center">
-            <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
-              <ChefHat className="w-8 h-8 text-zinc-500" />
+          <div className="flex flex-col items-center justify-center h-[70vh] text-center">
+            <div className="w-20 h-20 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(212,175,55,0.08)]">
+              <ChefHat className="w-10 h-10 text-[#d4af37]" />
             </div>
-            <h2 className="text-xl font-heading font-semibold text-zinc-100 mb-2">
+            <h2 className="text-2xl font-heading font-bold text-zinc-100 mb-2">
               No Projects Yet
             </h2>
-            <p className="text-zinc-500 mb-6">Create your first restaurant project to get started</p>
+            <p className="text-zinc-500 mb-8 max-w-sm">
+              Create your first restaurant project to unlock Command Center, Site Strategist, and the full suite.
+            </p>
             <Button
               data-testid="create-first-project-btn"
-              className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]"
+              onClick={() => setShowWizard(true)}
+              className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold px-8 h-12 text-base shadow-[0_0_24px_rgba(212,175,55,0.3)]"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-5 h-5 mr-2" />
               Create Project
             </Button>
           </div>
         ) : null}
       </main>
+
+      <ProjectWizard
+        open={showWizard}
+        onClose={() => setShowWizard(false)}
+        onCreated={handleProjectCreated}
+      />
     </div>
   );
 };
