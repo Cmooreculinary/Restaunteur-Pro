@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Restaunteur Pro — Current Architecture",
+    "subtitle": "Verified deployment and application boundaries",
+    "output": "current-architecture.html"
+  },
+  "components": [
+    {"id":"operator","type":"external","label":"Operator","sublabel":"Browser","pos":[35,280],"size":[120,60]},
+    {"id":"frontend","type":"frontend","label":"React Frontend","sublabel":"CRA + CRACO","pos":[220,280],"size":[135,60],"tag":"Render static"},
+    {"id":"api","type":"backend","label":"FastAPI API","sublabel":"app.py wrapper","pos":[455,280],"size":[135,60],"tag":"Render web"},
+    {"id":"legacy","type":"backend","label":"Legacy Core","sublabel":"server.py","pos":[665,280],"size":[135,60],"tag":"routes + logic"},
+    {"id":"sqlite","type":"database","label":"SQLite","sublabel":"/data/restaunteur.db","pos":[875,280],"size":[145,60],"tag":"1 GB disk"},
+    {"id":"google","type":"security","label":"Google OAuth","sublabel":"identity","pos":[455,90],"size":[135,60]},
+    {"id":"stripe","type":"external","label":"Stripe","sublabel":"payments","pos":[665,90],"size":[135,60]},
+    {"id":"ai","type":"external","label":"AI Providers","sublabel":"OpenAI + Anthropic","pos":[665,470],"size":[145,60]},
+    {"id":"office","type":"external","label":"OfficeCLI","sublabel":"documents","pos":[455,470],"size":[135,60]}
+  ],
+  "boundaries": [
+    {"kind":"region","label":"Render Blueprint","wraps":["frontend","api","legacy","sqlite"],"pad":30},
+    {"kind":"security-group","label":"Credentialed application boundary","wraps":["api","legacy"],"pad":18}
+  ],
+  "connections": [
+    {"from":"operator","to":"frontend","label":"HTTPS","variant":"emphasis"},
+    {"from":"frontend","to":"api","label":"cookie + bearer","variant":"security"},
+    {"from":"api","to":"legacy"},
+    {"from":"legacy","to":"sqlite","label":"SQL"},
+    {"from":"google","to":"api","label":"OAuth","variant":"security","fromSide":"bottom","toSide":"top","labelAt":[523,164]},
+    {"from":"stripe","to":"api","label":"signed webhook","variant":"security","fromSide":"bottom","toSide":"top"},
+    {"from":"legacy","to":"ai","label":"HTTPS","variant":"dashed","fromSide":"bottom","toSide":"top"},
+    {"from":"legacy","to":"office","label":"subprocess","variant":"dashed","fromSide":"bottom","toSide":"top"}
+  ],
+  "cards": [
+    {"dot":"cyan","title":"Deployment","items":["Two Render services from one repository","Static frontend and single API instance"]},
+    {"dot":"rose","title":"Risk concentration","items":["server.py owns routes, models, data, and integrations","Browser-accessible bearer token supplements cookie auth"]},
+    {"dot":"emerald","title":"Preserve","items":["Explicit CORS origins","Signed Stripe webhook","Persistent database disk"]}
+  ]
+}
