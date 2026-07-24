@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -24,31 +24,32 @@ const API = `${BACKEND_URL}/api`;
 const GroundUp = ({ project }) => {
   const [permits, setPermits] = useState([]);
   const [equipment, setEquipment] = useState([]);
+  const projectId = project?.project_id;
 
-  useEffect(() => {
-    if (project?.project_id) {
-      fetchPermits();
-      fetchEquipment();
-    }
-  }, [project?.project_id]);
-
-  const fetchPermits = async () => {
+  const fetchPermits = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/permits?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/permits?project_id=${projectId}`);
       setPermits(response.data);
     } catch (error) {
       console.error("Error fetching permits:", error);
     }
-  };
+  }, [projectId]);
 
-  const fetchEquipment = async () => {
+  const fetchEquipment = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/equipment?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/equipment?project_id=${projectId}`);
       setEquipment(response.data);
     } catch (error) {
       console.error("Error fetching equipment:", error);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchPermits();
+      fetchEquipment();
+    }
+  }, [fetchEquipment, fetchPermits, projectId]);
 
   // Sample permits if none exist
   const displayPermits = permits.length > 0 ? permits : [
