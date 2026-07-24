@@ -108,8 +108,8 @@ const CommandCenter = ({ project, onProjectUpdate }) => {
 
   const getAvatarColor = (color) => {
     const colors = {
-      purple: "bg-gradient-to-br from-purple-600 to-purple-800",
-      cyan: "bg-gradient-to-br from-cyan-500 to-cyan-700",
+      purple: "bg-zinc-800 border border-zinc-700 text-gold",
+      cyan: "bg-zinc-800 border border-zinc-700 text-zinc-200",
       amber: "bg-gradient-to-br from-amber-500 to-amber-700",
       emerald: "bg-gradient-to-br from-emerald-500 to-emerald-700",
     };
@@ -137,7 +137,7 @@ const CommandCenter = ({ project, onProjectUpdate }) => {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <div className="text-3xl font-heading font-bold text-[#d4af37]">
+            <div className="text-3xl font-heading font-bold text-gold">
               {project?.completion || 15}%
             </div>
             <div className="text-xs text-zinc-500 uppercase tracking-wider">Complete</div>
@@ -146,13 +146,13 @@ const CommandCenter = ({ project, onProjectUpdate }) => {
       </div>
 
       {/* Phase Stepper */}
-      <Card className="bg-[#18181b] border-zinc-800/50">
+      <Card className="bg-zinc-900 border-zinc-800/50">
         <CardContent className="p-6">
           <div className="flex items-center justify-between relative">
             {/* Progress line */}
             <div className="absolute top-5 left-0 right-0 h-0.5 bg-zinc-800" />
             <div 
-              className="absolute top-5 left-0 h-0.5 bg-[#d4af37] transition-all duration-500"
+              className="absolute top-5 left-0 h-0.5 bg-gold"
               style={{ width: `${(currentPhaseIndex / (phases.length - 1)) * 100}%` }}
             />
             
@@ -162,7 +162,7 @@ const CommandCenter = ({ project, onProjectUpdate }) => {
                   data-testid={`phase-${phase.id}`}
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                     index <= currentPhaseIndex
-                      ? "bg-[#d4af37] text-zinc-900"
+                      ? "bg-gold text-zinc-900"
                       : "bg-zinc-800 text-zinc-500"
                   }`}
                 >
@@ -188,7 +188,7 @@ const CommandCenter = ({ project, onProjectUpdate }) => {
         {/* Left Column - Tasks */}
         <div className="lg:col-span-8 space-y-6">
           {/* Critical Path Tasks */}
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
               <CardTitle className="text-lg font-heading text-zinc-100">
                 Critical Path Tasks
@@ -237,10 +237,10 @@ const CommandCenter = ({ project, onProjectUpdate }) => {
         {/* Right Column - Budget & Team */}
         <div className="lg:col-span-4 space-y-6">
           {/* Budget Health */}
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-[#d4af37]" />
+                <DollarSign className="w-5 h-5 text-gold" />
                 Budget Health
               </CardTitle>
             </CardHeader>
@@ -295,7 +295,7 @@ const CommandCenter = ({ project, onProjectUpdate }) => {
           </Card>
 
           {/* On-Site Team */}
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
                 <Users className="w-5 h-5 text-azure" />

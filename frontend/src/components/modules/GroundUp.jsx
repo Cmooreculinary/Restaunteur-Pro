@@ -129,10 +129,10 @@ const GroundUp = ({ project }) => {
       {/* Main Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Floor Plan Preview */}
-        <Card className="bg-[#18181b] border-zinc-800/50 md:col-span-2 lg:col-span-1">
+        <Card className="bg-zinc-900 border-zinc-800/50 md:col-span-2 lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-[#d4af37]" />
+              <Building2 className="w-5 h-5 text-gold" />
               3D Floor Plan
             </CardTitle>
           </CardHeader>
@@ -171,7 +171,7 @@ const GroundUp = ({ project }) => {
         </Card>
 
         {/* Permit Compliance Tracker */}
-        <Card className="bg-[#18181b] border-zinc-800/50">
+        <Card className="bg-zinc-900 border-zinc-800/50">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
@@ -219,7 +219,7 @@ const GroundUp = ({ project }) => {
         </Card>
 
         {/* Kitchen Equipment Planner */}
-        <Card className="bg-[#18181b] border-zinc-800/50 md:col-span-2 lg:col-span-1">
+        <Card className="bg-zinc-900 border-zinc-800/50 md:col-span-2 lg:col-span-1">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">

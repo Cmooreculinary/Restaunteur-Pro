@@ -119,135 +119,106 @@ const Dashboard = ({ user, setUser }) => {
     { id: "marketeer", icon: Megaphone, label: "Marketeer Agent" },
     { id: "ap", icon: Brain, label: "AP Intelligence" },
   ];
+  const activeModule = modules.find((module) => module.id === activeTab);
 
   return (
-    <div className="min-h-screen bg-[#0f0f10]">
-      {/* Top Navigation */}
-      <header className="sticky top-0 z-50 bg-[#0f0f10]/90 backdrop-blur-xl border-b border-zinc-800/50">
-        <div className="flex items-center justify-between px-6 py-3">
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#d4af37] flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.25)]">
-                <ChefHat className="w-5 h-5 text-zinc-900" />
-              </div>
-              <span className="text-lg font-heading font-bold text-zinc-100 hidden md:block">
-                Restaurateur Pro
-              </span>
-            </div>
+    <div className="app-shell min-h-screen bg-background">
+      <aside className="app-rail hidden lg:flex">
+        <div className="app-wordmark">
+          <span className="app-wordmark-mark"><ChefHat aria-hidden="true" /></span>
+          <span>Restaurateur<br />Pro</span>
+        </div>
+        <nav className="app-rail-nav" aria-label="Operations modules">
+          {modules.map((module) => (
+            <button
+              key={module.id}
+              data-testid={`tab-${module.id}`}
+              onClick={() => setActiveTab(module.id)}
+              className={activeTab === module.id ? "is-active" : ""}
+              aria-current={activeTab === module.id ? "page" : undefined}
+            >
+              <module.icon aria-hidden="true" />
+              <span>{module.label}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="app-rail-foot">
+          <span>Operator workspace</span>
+          <strong>{activeProject?.name || "No active project"}</strong>
+        </div>
+      </aside>
 
-            {/* Module Tabs */}
-            <nav className="hidden lg:flex items-center gap-1 bg-zinc-900/60 p-1 rounded-xl border border-zinc-800/40">
-              {modules.map((module) => (
-                <button
-                  key={module.id}
-                  data-testid={`tab-${module.id}`}
-                  onClick={() => setActiveTab(module.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    activeTab === module.id
-                      ? "bg-zinc-800 text-zinc-100 shadow-sm"
-                      : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-                  }`}
-                >
-                  <module.icon className="w-4 h-4" />
-                  <span className="hidden xl:inline">{module.label}</span>
-                </button>
-              ))}
-            </nav>
+      <div className="app-stage">
+        <header className="app-topbar">
+          <div className="app-context">
+            <span className="app-context-label">Current workspace</span>
+            <strong>{activeModule?.label}</strong>
           </div>
-
-          {/* Right Side */}
-          <div className="flex items-center gap-3">
-            {/* Project selector + New */}
+          <div className="app-actions">
             <div className="hidden md:flex items-center gap-2">
               {projects.length > 0 && (
                 <select
+                  aria-label="Active restaurant project"
                   value={activeProject?.project_id || ""}
                   onChange={(e) => {
-                    const p = projects.find((x) => x.project_id === e.target.value);
-                    if (p) setActiveProject(p);
+                    const project = projects.find((item) => item.project_id === e.target.value);
+                    if (project) setActiveProject(project);
                   }}
-                  className="bg-zinc-900 border border-zinc-800 text-zinc-200 text-sm rounded-lg px-3 py-2 max-w-[180px] focus:outline-none focus:border-zinc-600"
+                  className="app-project-select"
                 >
-                  {projects.map((p) => (
-                    <option key={p.project_id} value={p.project_id}>
-                      {p.name}
-                    </option>
+                  {projects.map((project) => (
+                    <option key={project.project_id} value={project.project_id}>{project.name}</option>
                   ))}
                 </select>
               )}
-              <Button
-                size="sm"
-                onClick={() => setShowWizard(true)}
-                className="bg-[#d4af37]/15 text-[#d4af37] hover:bg-[#d4af37]/25 border border-[#d4af37]/20"
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                New
+              <Button size="sm" onClick={() => setShowWizard(true)} className="app-new-project">
+                <Plus className="w-4 h-4" /> New project
               </Button>
             </div>
-
-            {/* Search */}
-            <div className="hidden md:flex relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <div className="app-search hidden xl:flex">
+              <Search aria-hidden="true" />
               <Input
                 data-testid="global-search"
-                placeholder="Search..."
+                aria-label="Search workspace"
+                placeholder="Search workspace"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 pl-9 bg-zinc-900/80 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-700"
               />
+              <kbd>⌘K</kbd>
             </div>
-
-            {/* Notifications */}
             <div className="relative">
               <Button
                 data-testid="notifications-btn"
                 variant="ghost"
                 size="icon"
-                className="relative text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+                className="app-icon-button relative"
+                aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
                 onClick={() => {
                   setShowNotifications(!showNotifications);
-                  if (!showNotifications && unreadCount > 0) {
-                    markNotificationsRead();
-                  }
+                  if (!showNotifications && unreadCount > 0) markNotificationsRead();
                 }}
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center text-white font-medium">
-                    {unreadCount}
-                  </span>
+                  <span className="app-unread-count">{unreadCount}</span>
                 )}
               </Button>
-
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-                    <span className="font-medium text-zinc-100">Notifications</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="w-6 h-6 text-zinc-400 hover:text-zinc-100"
-                      onClick={() => setShowNotifications(false)}
-                    >
+                <div className="app-notifications">
+                  <div className="app-notifications-head">
+                    <strong>Notifications</strong>
+                    <Button variant="ghost" size="icon" aria-label="Close notifications" onClick={() => setShowNotifications(false)}>
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
                   <ScrollArea className="h-64">
                     {notifications.length === 0 ? (
-                      <div className="p-4 text-center text-zinc-500 text-sm">
-                        No notifications
-                      </div>
+                      <div className="app-empty-note">No notifications</div>
                     ) : (
                       notifications.map((notif) => (
-                        <div
-                          key={notif.notification_id}
-                          className={`px-4 py-3 border-b border-zinc-800/50 hover:bg-zinc-800/50 ${
-                            !notif.read ? "bg-zinc-800/30" : ""
-                          }`}
-                        >
-                          <p className="text-sm text-zinc-200">{notif.title}</p>
-                          <p className="text-xs text-zinc-500 mt-1">{notif.message}</p>
+                        <div key={notif.notification_id} className={`app-notification ${!notif.read ? "is-unread" : ""}`}>
+                          <p>{notif.title}</p>
+                          <span>{notif.message}</span>
                         </div>
                       ))
                     )}
@@ -255,122 +226,74 @@ const Dashboard = ({ user, setUser }) => {
                 </div>
               )}
             </div>
-
-            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  data-testid="user-menu-btn"
-                  variant="ghost"
-                  className="flex items-center gap-2 hover:bg-zinc-800 px-2"
-                >
+                <Button data-testid="user-menu-btn" variant="ghost" className="app-user-button">
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={user?.picture} alt={user?.name} />
-                    <AvatarFallback className="bg-gradient-to-br from-purple-600 to-purple-800 text-white text-sm">
-                      {user?.name?.charAt(0) || "U"}
-                    </AvatarFallback>
+                    <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
-                  <span className="hidden md:block text-sm text-zinc-200">{user?.name}</span>
-                  <ChevronDown className="w-4 h-4 text-zinc-500" />
+                  <span className="hidden md:block">{user?.name}</span>
+                  <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-800">
-                <div className="px-3 py-2 border-b border-zinc-800">
-                  <p className="text-sm font-medium text-zinc-100">{user?.name}</p>
-                  <p className="text-xs text-zinc-500">{user?.email}</p>
+              <DropdownMenuContent align="end" className="app-menu w-56">
+                <div className="app-menu-identity">
+                  <p>{user?.name}</p>
+                  <span>{user?.email}</span>
                 </div>
-                <DropdownMenuItem className="text-zinc-300 hover:text-zinc-100 hover:bg-zinc-800 cursor-pointer">
-                  <User className="w-4 h-4 mr-2" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-zinc-300 hover:text-zinc-100 hover:bg-zinc-800 cursor-pointer">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-zinc-800" />
-                <DropdownMenuItem
-                  data-testid="logout-btn"
-                  onClick={handleLogout}
-                  className="text-red-400 hover:text-red-300 hover:bg-zinc-800 cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Log out
+                <DropdownMenuItem><User className="w-4 h-4 mr-2" /> Profile</DropdownMenuItem>
+                <DropdownMenuItem><Settings className="w-4 h-4 mr-2" /> Settings</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem data-testid="logout-btn" onClick={handleLogout} className="app-menu-danger">
+                  <LogOut className="w-4 h-4 mr-2" /> Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </div>
+        </header>
 
-        {/* Mobile Tab Nav */}
-        <div className="lg:hidden px-4 pb-3 overflow-x-auto">
-          <div className="flex items-center gap-2">
+        <nav className="app-mobile-nav lg:hidden" aria-label="Operations modules">
+          <div>
             {modules.map((module) => (
               <button
                 key={module.id}
                 data-testid={`mobile-tab-${module.id}`}
                 onClick={() => setActiveTab(module.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                  activeTab === module.id
-                    ? "bg-zinc-800 text-zinc-100"
-                    : "text-zinc-400 hover:text-zinc-200"
-                }`}
+                className={activeTab === module.id ? "is-active" : ""}
               >
                 <module.icon className="w-4 h-4" />
-                {module.label}
+                <span>{module.label}</span>
               </button>
             ))}
           </div>
-        </div>
-      </header>
+        </nav>
 
-      {/* Main Content */}
-      <main className="p-6">
-        {activeTab === "marketeer" && <MarketeerAgent />}
-        {activeTab === "ap" && <APIntelligence />}
-
-        {activeTab !== "marketeer" && activeTab !== "ap" && activeProject ? (
-          <>
-            {activeTab === "command" && (
-              <CommandCenter project={activeProject} onProjectUpdate={fetchProjects} />
-            )}
-            {activeTab === "site" && (
-              <SiteStrategist project={activeProject} />
-            )}
-            {activeTab === "ground" && (
-              <GroundUp project={activeProject} />
-            )}
-            {activeTab === "ops" && (
-              <OpsLaunchpad project={activeProject} />
-            )}
-            {activeTab === "expansion" && (
-              <ExpansionToolkit />
-            )}
-            {activeTab === "lease" && (
-              <LeaseNegotiation project={activeProject} />
-            )}
-          </>
-        ) : activeTab !== "marketeer" && activeTab !== "ap" ? (
-          <div className="flex flex-col items-center justify-center h-[70vh] text-center">
-            <div className="w-20 h-20 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(212,175,55,0.08)]">
-              <ChefHat className="w-10 h-10 text-[#d4af37]" />
-            </div>
-            <h2 className="text-2xl font-heading font-bold text-zinc-100 mb-2">
-              No Projects Yet
-            </h2>
-            <p className="text-zinc-500 mb-8 max-w-sm">
-              Create your first restaurant project to unlock Command Center, Site Strategist, and the full suite.
-            </p>
-            <Button
-              data-testid="create-first-project-btn"
-              onClick={() => setShowWizard(true)}
-              className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold px-8 h-12 text-base shadow-[0_0_24px_rgba(212,175,55,0.3)]"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Create Project
-            </Button>
-          </div>
-        ) : null}
-      </main>
+        <main className="app-workbench">
+          {activeTab === "marketeer" && <MarketeerAgent />}
+          {activeTab === "ap" && <APIntelligence />}
+          {activeTab !== "marketeer" && activeTab !== "ap" && activeProject ? (
+            <>
+              {activeTab === "command" && <CommandCenter project={activeProject} onProjectUpdate={fetchProjects} />}
+              {activeTab === "site" && <SiteStrategist project={activeProject} />}
+              {activeTab === "ground" && <GroundUp project={activeProject} />}
+              {activeTab === "ops" && <OpsLaunchpad project={activeProject} />}
+              {activeTab === "expansion" && <ExpansionToolkit />}
+              {activeTab === "lease" && <LeaseNegotiation project={activeProject} />}
+            </>
+          ) : activeTab !== "marketeer" && activeTab !== "ap" ? (
+            <section className="app-zero-state">
+              <span><ChefHat aria-hidden="true" /></span>
+              <p className="app-context-label">Begin the work</p>
+              <h2>No projects yet</h2>
+              <p>Create your first restaurant project to unlock the complete operations workbench.</p>
+              <Button data-testid="create-first-project-btn" onClick={() => setShowWizard(true)}>
+                <Plus className="w-5 h-5" /> Create project
+              </Button>
+            </section>
+          ) : null}
+        </main>
+      </div>
 
       <ProjectWizard
         open={showWizard}

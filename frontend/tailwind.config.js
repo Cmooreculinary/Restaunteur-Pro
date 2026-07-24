@@ -8,9 +8,9 @@ module.exports = {
   theme: {
         extend: {
                 fontFamily: {
-                        'heading': ['Outfit', 'sans-serif'],
-                        'body': ['Inter', 'sans-serif'],
-                        'mono': ['JetBrains Mono', 'monospace'],
+                        'heading': ['Bebas Neue', 'Arial Narrow', 'sans-serif'],
+                        'body': ['DM Sans', 'sans-serif'],
+                        'mono': ['IBM Plex Mono', 'monospace'],
                 },
                 borderRadius: {
                         lg: 'var(--radius)',
@@ -18,39 +18,39 @@ module.exports = {
                         sm: 'calc(var(--radius) - 4px)'
                 },
                 colors: {
-                        background: 'hsl(var(--background))',
-                        foreground: 'hsl(var(--foreground))',
+                        background: 'var(--background)',
+                        foreground: 'var(--foreground)',
                         card: {
-                                DEFAULT: 'hsl(var(--card))',
-                                foreground: 'hsl(var(--card-foreground))'
+                                DEFAULT: 'var(--card)',
+                                foreground: 'var(--card-foreground)'
                         },
                         popover: {
-                                DEFAULT: 'hsl(var(--popover))',
-                                foreground: 'hsl(var(--popover-foreground))'
+                                DEFAULT: 'var(--popover)',
+                                foreground: 'var(--popover-foreground)'
                         },
                         primary: {
-                                DEFAULT: 'hsl(var(--primary))',
-                                foreground: 'hsl(var(--primary-foreground))'
+                                DEFAULT: 'var(--primary)',
+                                foreground: 'var(--primary-foreground)'
                         },
                         secondary: {
-                                DEFAULT: 'hsl(var(--secondary))',
-                                foreground: 'hsl(var(--secondary-foreground))'
+                                DEFAULT: 'var(--secondary)',
+                                foreground: 'var(--secondary-foreground)'
                         },
                         muted: {
-                                DEFAULT: 'hsl(var(--muted))',
-                                foreground: 'hsl(var(--muted-foreground))'
+                                DEFAULT: 'var(--muted)',
+                                foreground: 'var(--muted-foreground)'
                         },
                         accent: {
-                                DEFAULT: 'hsl(var(--accent))',
-                                foreground: 'hsl(var(--accent-foreground))'
+                                DEFAULT: 'var(--accent)',
+                                foreground: 'var(--accent-foreground)'
                         },
                         destructive: {
-                                DEFAULT: 'hsl(var(--destructive))',
-                                foreground: 'hsl(var(--destructive-foreground))'
+                                DEFAULT: 'var(--destructive)',
+                                foreground: 'var(--destructive-foreground)'
                         },
-                        border: 'hsl(var(--border))',
-                        input: 'hsl(var(--input))',
-                        ring: 'hsl(var(--ring))',
+                        border: 'var(--border)',
+                        input: 'var(--input)',
+                        ring: 'var(--ring)',
                         chart: {
                                 '1': 'hsl(var(--chart-1))',
                                 '2': 'hsl(var(--chart-2))',
@@ -59,7 +59,8 @@ module.exports = {
                                 '5': 'hsl(var(--chart-5))'
                         },
                         fire: '#ef4444',
-                        gold: '#d4af37',
+                        gold: '#EC5B13',
+                        'fire-hover': '#FF7A2F',
                         amber: '#f59e0b',
                         emerald: '#22c55e',
                         azure: '#3b82f6',

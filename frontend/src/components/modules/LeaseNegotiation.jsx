@@ -120,8 +120,8 @@ const LeaseNegotiation = ({ project }) => {
           </h1>
           <p className="text-zinc-400 mt-1">Track and manage lease terms and negotiations</p>
         </div>
-        <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#18181b] border border-zinc-800/50">
-          <Timer className="w-5 h-5 text-[#d4af37]" />
+        <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800/50">
+          <Timer className="w-5 h-5 text-gold" />
           <div>
             <p className="text-sm font-medium text-zinc-100">Est. Completion</p>
             <p className="text-xs text-zinc-500">~2 weeks remaining</p>
@@ -130,7 +130,7 @@ const LeaseNegotiation = ({ project }) => {
       </div>
 
       {/* Negotiation Phase Progress */}
-      <Card className="bg-[#18181b] border-zinc-800/50">
+      <Card className="bg-zinc-900 border-zinc-800/50">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-zinc-400">Negotiation Phase</h3>
@@ -141,7 +141,7 @@ const LeaseNegotiation = ({ project }) => {
             {/* Progress line */}
             <div className="absolute top-5 left-0 right-0 h-0.5 bg-zinc-800" />
             <div 
-              className="absolute top-5 left-0 h-0.5 bg-[#d4af37] transition-all duration-500"
+              className="absolute top-5 left-0 h-0.5 bg-gold"
               style={{ width: `${(currentPhase / (phases.length - 1)) * 100}%` }}
             />
             
@@ -151,7 +151,7 @@ const LeaseNegotiation = ({ project }) => {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                       index <= currentPhase
-                        ? "bg-[#d4af37] text-zinc-900"
+                        ? "bg-gold text-zinc-900"
                         : "bg-zinc-800 text-zinc-500"
                     }`}
                   >
@@ -176,11 +176,11 @@ const LeaseNegotiation = ({ project }) => {
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Lease Checklist */}
-        <Card className="bg-[#18181b] border-zinc-800/50 lg:col-span-2">
+        <Card className="bg-zinc-900 border-zinc-800/50 lg:col-span-2">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#d4af37]" />
+                <FileText className="w-5 h-5 text-gold" />
                 Restaurant Lease Checklist
               </CardTitle>
               <Button
@@ -220,10 +220,10 @@ const LeaseNegotiation = ({ project }) => {
         </Card>
 
         {/* AI Clause Analyzer */}
-        <Card className="bg-[#18181b] border-zinc-800/50">
+        <Card className="bg-zinc-900 border-zinc-800/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#d4af37]" />
+              <Sparkles className="w-5 h-5 text-gold" />
               AI Clause Analyzer
             </CardTitle>
           </CardHeader>
@@ -245,15 +245,15 @@ const LeaseNegotiation = ({ project }) => {
               data-testid="analyze-clause-btn"
               onClick={analyzeWithAI}
               disabled={analyzing}
-              className="w-full bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]"
+              className="w-full bg-gold text-zinc-900 hover:bg-fire-hover"
             >
               <Sparkles className={`w-4 h-4 mr-2 ${analyzing ? "animate-pulse" : ""}`} />
               {analyzing ? "Analyzing..." : "Analyze Clause"}
             </Button>
 
             {aiAnalysis && (
-              <div className="p-4 rounded-lg bg-zinc-900 border border-[#d4af37]/20 max-h-64 overflow-y-auto">
-                <p className="text-xs text-[#d4af37] font-medium mb-2">AI Analysis</p>
+              <div className="p-4 rounded-lg bg-zinc-900 border border-gold/20 max-h-64 overflow-y-auto">
+                <p className="text-xs text-gold font-medium mb-2">AI Analysis</p>
                 <p className="text-sm text-zinc-300 whitespace-pre-wrap">{aiAnalysis}</p>
               </div>
             )}

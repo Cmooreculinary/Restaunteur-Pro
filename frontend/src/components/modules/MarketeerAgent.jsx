@@ -41,8 +41,8 @@ const CampaignCard = ({ campaign, onDelete }) => {
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#d4af37]/10 flex items-center justify-center">
-            <Icon className="w-4 h-4 text-[#d4af37]" />
+          <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
+            <Icon className="w-4 h-4 text-gold" />
           </div>
           <div>
             <p className="text-sm font-medium text-zinc-200">{campaign.name}</p>
@@ -149,8 +149,8 @@ const MarketeerAgent = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-heading font-bold text-zinc-100 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#d4af37]/10 flex items-center justify-center">
-              <Megaphone className="w-5 h-5 text-[#d4af37]" />
+            <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center">
+              <Megaphone className="w-5 h-5 text-gold" />
             </div>
             Marketeer Agent
           </h2>
@@ -161,7 +161,7 @@ const MarketeerAgent = () => {
             variant={activeView === "generate" ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveView("generate")}
-            className={activeView === "generate" ? "bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"}
+            className={activeView === "generate" ? "bg-gold text-zinc-900 hover:bg-fire-hover" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"}
           >
             <Plus className="w-4 h-4 mr-1" />
             Generate
@@ -170,7 +170,7 @@ const MarketeerAgent = () => {
             variant={activeView === "history" ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveView("history")}
-            className={activeView === "history" ? "bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"}
+            className={activeView === "history" ? "bg-gold text-zinc-900 hover:bg-fire-hover" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"}
           >
             <BookOpen className="w-4 h-4 mr-1" />
             History ({campaigns.length})
@@ -194,11 +194,11 @@ const MarketeerAgent = () => {
                       onClick={() => setSelectedTask(task.id)}
                       className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-colors ${
                         selectedTask === task.id
-                          ? "border-[#d4af37] bg-[#d4af37]/5 text-zinc-100"
+                          ? "border-gold bg-gold/5 text-zinc-100"
                           : "border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-300"
                       }`}
                     >
-                      <Icon className={`w-4 h-4 flex-shrink-0 ${selectedTask === task.id ? "text-[#d4af37]" : ""}`} />
+                      <Icon className={`w-4 h-4 flex-shrink-0 ${selectedTask === task.id ? "text-gold" : ""}`} />
                       <div>
                         <span className="text-sm font-medium block">{task.label}</span>
                         <span className="text-xs text-zinc-600">{task.desc}</span>
@@ -225,7 +225,7 @@ const MarketeerAgent = () => {
                         key={p}
                         onClick={() => setPlatform(p === platform ? "" : p)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors capitalize ${
-                          platform === p ? "bg-[#d4af37] text-zinc-900 border-[#d4af37]" : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-600"
+                          platform === p ? "bg-gold text-zinc-900 border-gold" : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-600"
                         }`}
                       >
                         {p}
@@ -243,7 +243,7 @@ const MarketeerAgent = () => {
                       key={t}
                       onClick={() => setTone(t === tone ? "" : t)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors capitalize ${
-                        tone === t ? "bg-[#d4af37] text-zinc-900 border-[#d4af37]" : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-600"
+                        tone === t ? "bg-gold text-zinc-900 border-gold" : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-600"
                       }`}
                     >
                       {t}
@@ -270,7 +270,7 @@ const MarketeerAgent = () => {
               <Button
                 onClick={handleGenerate}
                 disabled={!selectedTask || generating}
-                className="w-full mt-4 bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold"
+                className="w-full mt-4 bg-gold text-zinc-900 hover:bg-fire-hover font-semibold"
               >
                 {generating ? (
                   <>
@@ -288,10 +288,10 @@ const MarketeerAgent = () => {
 
             {/* Result */}
             {result && (
-              <div className="bg-zinc-900 border border-[#d4af37]/30 rounded-xl p-5">
+              <div className="bg-zinc-900 border border-gold/30 rounded-xl p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#d4af37]" />
+                    <Sparkles className="w-4 h-4 text-gold" />
                     <span className="text-sm font-semibold text-zinc-200">Generated Content</span>
                   </div>
                   <button onClick={copyResult} className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 px-2 py-1 rounded hover:bg-zinc-800">
@@ -329,7 +329,7 @@ const MarketeerAgent = () => {
               </div>
               <p className="text-zinc-500">No campaigns generated yet</p>
               <p className="text-zinc-600 text-sm mt-1">Generate your first marketing content to see it here</p>
-              <Button onClick={() => setActiveView("generate")} className="mt-4 bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]" size="sm">
+              <Button onClick={() => setActiveView("generate")} className="mt-4 bg-gold text-zinc-900 hover:bg-fire-hover" size="sm">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Content
               </Button>

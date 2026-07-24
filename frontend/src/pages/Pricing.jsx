@@ -57,10 +57,10 @@ const Pricing = ({ user }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f10]">
+    <div className="public-page pricing-page min-h-screen bg-background">
       <nav className="flex items-center justify-between px-8 py-5 border-b border-zinc-800">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#d4af37] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center">
             <ChefHat className="w-4 h-4 text-zinc-900" />
           </div>
           <span className="font-bold text-zinc-100">Restaurateur Pro</span>
@@ -97,7 +97,7 @@ const Pricing = ({ user }) => {
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
@@ -109,12 +109,12 @@ const Pricing = ({ user }) => {
                   key={plan.id}
                   className={`rounded-2xl p-6 border ${
                     isPopular
-                      ? "border-[#d4af37] bg-[#d4af37]/5"
+                      ? "border-gold bg-gold/5"
                       : "border-zinc-800 bg-zinc-900"
                   } relative`}
                 >
                   {isPopular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 bg-[#d4af37] rounded-full">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 bg-gold rounded-full">
                       <Crown className="w-3.5 h-3.5 text-zinc-900" />
                       <span className="text-xs font-bold text-zinc-900">POPULAR</span>
                     </div>
@@ -131,7 +131,7 @@ const Pricing = ({ user }) => {
                   <ul className="space-y-3 mb-6">
                     {(plan.features || []).map((feature) => (
                       <li key={feature} className="flex items-center gap-2 text-sm text-zinc-300">
-                        <CheckCircle className="w-4 h-4 text-[#d4af37] flex-shrink-0" />
+                        <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" />
                         {feature}
                       </li>
                     ))}
@@ -144,7 +144,7 @@ const Pricing = ({ user }) => {
                       isCurrent
                         ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
                         : isPopular
-                        ? "bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]"
+                        ? "bg-gold text-zinc-900 hover:bg-fire-hover"
                         : "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
                     }`}
                   >

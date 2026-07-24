@@ -1,8 +1,9 @@
 import requests
 import json
+import os
 
 def test_simple():
-    base_url = "https://live-support-hub-1.preview.emergentagent.com/api"
+    base_url = os.environ.get("RESTAURATEUR_PRO_API_URL", "http://localhost:8000/api")
     
     print("Testing basic endpoints...")
     
