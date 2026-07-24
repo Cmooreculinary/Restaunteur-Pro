@@ -133,11 +133,11 @@ const OpsLaunchpad = ({ project }) => {
 
         {/* Quick Stats */}
         <div className="flex gap-4">
-          <div className="px-4 py-2 rounded-lg bg-[#18181b] border border-zinc-800/50">
+          <div className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800/50">
             <p className="text-2xl font-heading font-bold text-azure">{openRoles}</p>
             <p className="text-xs text-zinc-500">Open Roles</p>
           </div>
-          <div className="px-4 py-2 rounded-lg bg-[#18181b] border border-zinc-800/50">
+          <div className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800/50">
             <p className="text-2xl font-heading font-bold text-emerald">{foodCostPercent}%</p>
             <p className="text-xs text-zinc-500">Food Cost</p>
           </div>
@@ -147,7 +147,7 @@ const OpsLaunchpad = ({ project }) => {
       {/* Main Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Hiring Pipeline */}
-        <Card className="bg-[#18181b] border-zinc-800/50 lg:col-span-2">
+        <Card className="bg-zinc-900 border-zinc-800/50 lg:col-span-2">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
@@ -199,7 +199,7 @@ const OpsLaunchpad = ({ project }) => {
                     className="flex items-center justify-between p-3 rounded-lg bg-zinc-900/50 hover:bg-zinc-900 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white text-sm font-medium">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-gold text-sm font-medium">
                         {candidate.name.split(" ").map(n => n[0]).join("")}
                       </div>
                       <div>
@@ -217,10 +217,10 @@ const OpsLaunchpad = ({ project }) => {
         </Card>
 
         {/* Menu Engineering - Cost Calculator */}
-        <Card className="bg-[#18181b] border-zinc-800/50 lg:col-span-2">
+        <Card className="bg-zinc-900 border-zinc-800/50 lg:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
-              <ChefHat className="w-5 h-5 text-[#d4af37]" />
+              <ChefHat className="w-5 h-5 text-gold" />
               AI Cost Calculator
             </CardTitle>
           </CardHeader>
@@ -242,15 +242,15 @@ const OpsLaunchpad = ({ project }) => {
               data-testid="calculate-cost-btn"
               onClick={calculateCost}
               disabled={calculating}
-              className="w-full bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]"
+              className="w-full bg-gold text-zinc-900 hover:bg-fire-hover"
             >
               <Sparkles className={`w-4 h-4 mr-2 ${calculating ? "animate-pulse" : ""}`} />
               {calculating ? "Calculating..." : "Calculate Recipe Cost"}
             </Button>
 
             {costResult && (
-              <div className="p-4 rounded-lg bg-zinc-900 border border-[#d4af37]/20">
-                <p className="text-xs text-[#d4af37] font-medium mb-2">AI Cost Analysis</p>
+              <div className="p-4 rounded-lg bg-zinc-900 border border-gold/20">
+                <p className="text-xs text-gold font-medium mb-2">AI Cost Analysis</p>
                 <p className="text-sm text-zinc-300 whitespace-pre-wrap">{costResult}</p>
               </div>
             )}
@@ -274,7 +274,7 @@ const OpsLaunchpad = ({ project }) => {
         </Card>
 
         {/* Supply Chain */}
-        <Card className="bg-[#18181b] border-zinc-800/50 lg:col-span-4">
+        <Card className="bg-zinc-900 border-zinc-800/50 lg:col-span-4">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">

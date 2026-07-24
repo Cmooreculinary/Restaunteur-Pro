@@ -13,11 +13,11 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const GoldenDomeLogo = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg aria-hidden="true" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#f5d060" />
-        <stop offset="100%" stopColor="#c9922a" />
+        <stop offset="0%" stopColor="var(--color-accent-hover)" />
+        <stop offset="100%" stopColor="var(--color-accent)" />
       </linearGradient>
     </defs>
     <circle cx="24" cy="24" r="22" fill="url(#goldGrad)" opacity="0.15" />
@@ -113,7 +113,7 @@ const Landing = ({ setUser }) => {
 
   if (view === "login" || view === "register") {
     return (
-      <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center px-4">
+      <div className="auth-page min-h-screen bg-background flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
@@ -183,7 +183,7 @@ const Landing = ({ setUser }) => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold"
+                className="w-full bg-gold text-zinc-900 hover:bg-fire-hover font-semibold"
               >
                 {loading ? "Please wait..." : view === "login" ? "Sign In" : "Create Account"}
               </Button>
@@ -194,7 +194,7 @@ const Landing = ({ setUser }) => {
                 {view === "login" ? "Don't have an account? " : "Already have an account? "}
                 <button
                   onClick={() => { setView(view === "login" ? "register" : "login"); setErrors({}); }}
-                  className="text-[#d4af37] hover:underline"
+                  className="text-gold hover:underline"
                 >
                   {view === "login" ? "Sign up" : "Sign in"}
                 </button>
@@ -228,10 +228,10 @@ const Landing = ({ setUser }) => {
 
   if (view === "secret") {
     return (
-      <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center px-4">
+      <div className="auth-page min-h-screen bg-background flex items-center justify-center px-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-6">
-            <KeyRound className="w-8 h-8 text-[#d4af37] mx-auto mb-2" />
+            <KeyRound className="w-8 h-8 text-gold mx-auto mb-2" />
             <h2 className="text-xl font-bold text-zinc-100">Admin Access</h2>
           </div>
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
@@ -243,7 +243,7 @@ const Landing = ({ setUser }) => {
                 onChange={(e) => setSecretCode(e.target.value)}
                 className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600"
               />
-              <Button type="submit" disabled={loading} className="w-full bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold">
+              <Button type="submit" disabled={loading} className="w-full bg-gold text-zinc-900 hover:bg-fire-hover font-semibold">
                 {loading ? "Verifying..." : "Access Platform"}
               </Button>
             </form>
@@ -257,27 +257,25 @@ const Landing = ({ setUser }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f10] overflow-hidden">
-      <div className="relative">
-        <div className="absolute inset-0 hero-gradient" />
-        <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#d4af37] flex items-center justify-center">
-              <ChefHat className="w-6 h-6 text-zinc-900" />
-            </div>
-            <span className="text-xl font-heading font-bold text-zinc-100">Restaurateur Pro</span>
+    <div className="marketing-shell min-h-screen bg-background">
+      <div className="marketing-hero">
+        <nav className="marketing-nav">
+          <div className="marketing-brand">
+            <span><ChefHat aria-hidden="true" /></span>
+            <strong>Restaurateur Pro</strong>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="marketing-nav-actions">
+            <a href="/pricing">Pricing</a>
             <Button
               variant="ghost"
               onClick={() => setView("login")}
-              className="text-zinc-300 hover:text-zinc-100 hover:bg-zinc-800"
+              className="marketing-sign-in"
             >
               Sign In
             </Button>
             <Button
               onClick={() => setView("register")}
-              className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-medium"
+              className="marketing-primary"
               data-testid="nav-login-btn"
             >
               Get Started
@@ -285,118 +283,97 @@ const Landing = ({ setUser }) => {
           </div>
         </nav>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-8 pt-20 pb-32">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 mb-6">
-              <span className="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse" />
-              <span className="text-sm text-[#d4af37] font-medium">AI-Powered Restaurant Management</span>
-            </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-zinc-100 leading-tight mb-6">
-              Build or Scale Your
-              <span className="block text-[#d4af37]">Business</span>
+        <div className="marketing-hero-body">
+          <div className="marketing-hero-copy">
+            <p className="marketing-eyebrow">Restaurant development + operations</p>
+            <h1>
+              Build the restaurant.
+              <span>Run the work.</span>
             </h1>
-            <p className="text-lg text-zinc-400 max-w-xl mb-10 leading-relaxed">
+            <p className="marketing-lede">
               From concept to multi-unit expansion. The complete platform for restaurateurs
               to plan, build, launch, and grow successful restaurant ventures.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="marketing-hero-actions">
               <Button
                 data-testid="hero-get-started-btn"
                 onClick={() => setView("register")}
-                className="bg-zinc-100 text-zinc-900 hover:bg-zinc-200 font-medium px-8 py-6 text-lg group"
+                className="marketing-primary"
               >
                 Get Started Free
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5" />
               </Button>
               <Button
                 data-testid="hero-demo-btn"
                 variant="outline"
                 onClick={() => setView("secret")}
-                className="bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:border-zinc-600 font-medium px-8 py-6 text-lg"
+                className="marketing-secondary"
               >
                 Demo Access
               </Button>
             </div>
           </div>
+          <div className="marketing-hero-index" aria-label="Platform scope">
+            <span>01</span><p>Plan</p>
+            <span>02</span><p>Build</p>
+            <span>03</span><p>Launch</p>
+            <span>04</span><p>Operate</p>
+          </div>
         </div>
       </div>
 
-      <section className="relative py-24 px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-zinc-100 mb-4">
-              Seven Powerful Modules
-            </h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">
-              Everything you need to take your restaurant from idea to thriving business
-            </p>
+      <section className="marketing-modules">
+        <div className="marketing-section-head">
+          <div>
+            <p className="marketing-eyebrow">The operating system</p>
+            <h2>Seven modules. One restaurant journey.</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <p>
+              Everything you need to take your restaurant from idea to thriving business
+          </p>
+        </div>
+          <div className="marketing-module-list">
             {modules.map((module, index) => (
               <div
                 key={module.name}
                 data-testid={`module-card-${index}`}
-                className="group p-6 rounded-xl bg-[#18181b] border border-zinc-800/50 hover:border-zinc-700/50 cursor-pointer transition-all hover:-translate-y-1"
+                className="marketing-module"
               >
-                <div className="w-12 h-12 rounded-lg bg-zinc-800 flex items-center justify-center mb-4 group-hover:bg-[#d4af37]/10 transition-colors">
-                  <module.icon className="w-6 h-6 text-zinc-400 group-hover:text-[#d4af37] transition-colors" />
-                </div>
-                <h3 className="text-lg font-heading font-semibold text-zinc-100 mb-2">{module.name}</h3>
-                <p className="text-sm text-zinc-500">{module.desc}</p>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <module.icon aria-hidden="true" />
+                <h3>{module.name}</h3>
+                <p>{module.desc}</p>
+                <ArrowRight aria-hidden="true" />
               </div>
             ))}
           </div>
-        </div>
       </section>
 
-      <section className="py-20 px-8 border-t border-zinc-800/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { value: "500+", label: "Restaurants Launched" },
-              { value: "$2.4B", label: "Revenue Generated" },
-              { value: "98%", label: "Success Rate" },
-              { value: "24/7", label: "AI Support" },
-            ].map((stat, index) => (
-              <div key={index} className="text-center" data-testid={`stat-${index}`}>
-                <div className="text-4xl md:text-5xl font-heading font-bold text-zinc-100 mb-2">{stat.value}</div>
-                <div className="text-sm text-zinc-500 uppercase tracking-wider">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-24 px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-zinc-100 mb-6">
-            Ready to Build Your Restaurant?
-          </h2>
-          <p className="text-zinc-400 mb-10 max-w-xl mx-auto">
-            Join thousands of restaurateurs who trust Restaurateur Pro to bring their culinary visions to life.
+      <section className="marketing-cta">
+          <p className="marketing-eyebrow">Your next service starts here</p>
+          <h2>Ready to build your restaurant?</h2>
+          <p>
+            Put the concept, site, build, opening plan, and operating intelligence in one disciplined workspace.
           </p>
           <Button
             data-testid="cta-get-started-btn"
             onClick={() => setView("register")}
-            className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold px-10 py-6 text-lg"
+            className="marketing-primary"
           >
             Start Your Journey
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <ArrowRight className="w-5 h-5" />
           </Button>
-        </div>
       </section>
 
-      <footer className="py-8 px-8 border-t border-zinc-800/50">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <ChefHat className="w-5 h-5 text-[#d4af37]" />
-            <span className="text-sm text-zinc-500">Restaurateur Pro</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <a href="/pricing" className="text-xs text-zinc-600 hover:text-zinc-400">Pricing</a>
-            <a href="/donate" className="text-xs text-zinc-600 hover:text-[#d4af37]">Support Us ♥</a>
-            <p className="text-xs text-zinc-600">© 2026 Restaurateur Pro. All rights reserved.</p>
-          </div>
+      <footer className="marketing-footer">
+        <h2>Built for the people who open the doors.</h2>
+        <div>
+          <p>Restaurateur Pro</p>
+          <nav aria-label="Footer">
+            <a href="/pricing">Pricing</a>
+            <a href="/donate">Support Us</a>
+          </nav>
+          <p>© 2026 Restaurateur Pro</p>
         </div>
       </footer>
     </div>

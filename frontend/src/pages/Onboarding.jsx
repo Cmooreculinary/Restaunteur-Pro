@@ -50,7 +50,7 @@ const Toggle = ({ value, options, onChange, multiple = false }) => (
           }}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
             active
-              ? "bg-[#d4af37] text-zinc-900 border-[#d4af37]"
+              ? "bg-gold text-zinc-900 border-gold"
               : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-600 hover:text-zinc-300"
           }`}
         >
@@ -179,7 +179,7 @@ const Onboarding = ({ user, setUser }) => {
               <Field label="Parking"><Input type="number" value={location.parking_spaces} onChange={(e) => setLocation({ ...location, parking_spaces: e.target.value })} placeholder="20" className="bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600" /></Field>
             </div>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={location.has_patio} onChange={(e) => setLocation({ ...location, has_patio: e.target.checked })} className="w-4 h-4 accent-[#d4af37]" />
+              <input type="checkbox" checked={location.has_patio} onChange={(e) => setLocation({ ...location, has_patio: e.target.checked })} className="w-4 h-4 accent-gold" />
               <span className="text-zinc-300 text-sm">Has outdoor patio</span>
             </label>
             {location.has_patio && (
@@ -263,11 +263,11 @@ const Onboarding = ({ user, setUser }) => {
   const StepIcon = steps[currentStep].icon;
 
   return (
-    <div className="min-h-screen bg-[#0f0f10] flex flex-col">
+    <div className="public-page onboarding-page min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#d4af37] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center">
             <ChefHat className="w-4 h-4 text-zinc-900" />
           </div>
           <span className="font-bold text-zinc-100">Restaurateur Pro</span>
@@ -286,7 +286,7 @@ const Onboarding = ({ user, setUser }) => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-zinc-400">Step {currentStep + 1} of {steps.length}</span>
-            <span className="text-sm text-[#d4af37] font-medium">{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
+            <span className="text-sm text-gold font-medium">{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
           </div>
           <Progress value={((currentStep + 1) / steps.length) * 100} className="h-2 bg-zinc-800" />
 
@@ -299,7 +299,7 @@ const Onboarding = ({ user, setUser }) => {
                   onClick={() => i < currentStep && setCurrentStep(i)}
                   disabled={i > currentStep}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                    i === currentStep ? "bg-[#d4af37] text-zinc-900" :
+                    i === currentStep ? "bg-gold text-zinc-900" :
                     i < currentStep ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 cursor-pointer" :
                     "bg-zinc-900 text-zinc-600 cursor-not-allowed"
                   }`}
@@ -315,8 +315,8 @@ const Onboarding = ({ user, setUser }) => {
         {/* Step content */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-[#d4af37]/10 flex items-center justify-center">
-              <StepIcon className="w-5 h-5 text-[#d4af37]" />
+            <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center">
+              <StepIcon className="w-5 h-5 text-gold" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-zinc-100">{steps[currentStep].title}</h2>
@@ -340,7 +340,7 @@ const Onboarding = ({ user, setUser }) => {
           <Button
             onClick={() => saveStep(currentStep)}
             disabled={saving}
-            className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold"
+            className="bg-gold text-zinc-900 hover:bg-fire-hover font-semibold"
           >
             {saving ? "Saving..." : currentStep === steps.length - 1 ? "Complete Setup" : "Next"}
             {!saving && <ArrowRight className="w-4 h-4 ml-2" />}

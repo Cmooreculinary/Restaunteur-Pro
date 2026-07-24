@@ -82,7 +82,7 @@ const ExpansionToolkit = () => {
         </div>
         <Button
           data-testid="add-unit-btn"
-          className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]"
+          className="bg-gold text-zinc-900 hover:bg-fire-hover"
         >
           <Plus className="w-4 h-4 mr-2" />
           Plan New Unit
@@ -91,10 +91,10 @@ const ExpansionToolkit = () => {
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-[#18181b] border-zinc-800/50">
+        <Card className="bg-zinc-900 border-zinc-800/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <DollarSign className="w-5 h-5 text-[#d4af37]" />
+              <DollarSign className="w-5 h-5 text-gold" />
               <Badge className="badge-green">
                 <ArrowUpRight className="w-3 h-3 mr-1" />
                 12.5%
@@ -107,7 +107,7 @@ const ExpansionToolkit = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#18181b] border-zinc-800/50">
+        <Card className="bg-zinc-900 border-zinc-800/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <Building2 className="w-5 h-5 text-azure" />
@@ -117,7 +117,7 @@ const ExpansionToolkit = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#18181b] border-zinc-800/50">
+        <Card className="bg-zinc-900 border-zinc-800/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <Target className="w-5 h-5 text-emerald" />
@@ -127,7 +127,7 @@ const ExpansionToolkit = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#18181b] border-zinc-800/50">
+        <Card className="bg-zinc-900 border-zinc-800/50">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <TrendingUp className="w-5 h-5 text-violet" />
@@ -141,7 +141,7 @@ const ExpansionToolkit = () => {
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Multi-Unit Dashboard */}
-        <Card className="bg-[#18181b] border-zinc-800/50 lg:col-span-2">
+        <Card className="bg-zinc-900 border-zinc-800/50 lg:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
               <Building2 className="w-5 h-5 text-azure" />
@@ -184,7 +184,7 @@ const ExpansionToolkit = () => {
         </Card>
 
         {/* Franchise Readiness Score */}
-        <Card className="bg-[#18181b] border-zinc-800/50">
+        <Card className="bg-zinc-900 border-zinc-800/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
               <Target className="w-5 h-5 text-emerald" />
@@ -201,7 +201,7 @@ const ExpansionToolkit = () => {
                     cy="50"
                     r="45"
                     fill="none"
-                    stroke="#27272a"
+                    stroke="var(--color-paper-3)"
                     strokeWidth="10"
                   />
                   <circle
@@ -209,7 +209,7 @@ const ExpansionToolkit = () => {
                     cy="50"
                     r="45"
                     fill="none"
-                    stroke="#d4af37"
+                    stroke="var(--color-accent)"
                     strokeWidth="10"
                     strokeLinecap="round"
                     strokeDasharray={`${readinessScore * 2.83} 283`}
@@ -238,11 +238,11 @@ const ExpansionToolkit = () => {
         </Card>
 
         {/* Unit Replication Checklist */}
-        <Card className="bg-[#18181b] border-zinc-800/50 lg:col-span-3">
+        <Card className="bg-zinc-900 border-zinc-800/50 lg:col-span-3">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
-                <CheckSquare className="w-5 h-5 text-[#d4af37]" />
+                <CheckSquare className="w-5 h-5 text-gold" />
                 Unit Replication Checklist
               </CardTitle>
               <span className="text-sm text-zinc-400">

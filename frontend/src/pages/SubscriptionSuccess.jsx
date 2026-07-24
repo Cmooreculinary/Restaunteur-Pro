@@ -30,14 +30,14 @@ const SubscriptionSuccess = () => {
   }, [searchParams, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center px-4">
+    <div className="public-page status-page min-h-screen bg-background flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-gold/10 flex items-center justify-center">
             {status === "loading" ? (
-              <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
             ) : (
-              <CheckCircle className="w-8 h-8 text-[#d4af37]" />
+              <CheckCircle className="w-8 h-8 text-gold" />
             )}
           </div>
         </div>
@@ -47,7 +47,7 @@ const SubscriptionSuccess = () => {
           <>
             <h1 className="text-2xl font-bold text-zinc-100 mb-2">You're in!</h1>
             <p className="text-zinc-400 mb-6">Your subscription is active. Welcome to the full Restaurateur Pro experience.</p>
-            <Button onClick={() => navigate("/dashboard")} className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold px-8">
+            <Button onClick={() => navigate("/dashboard")} className="bg-gold text-zinc-900 hover:bg-fire-hover font-semibold px-8">
               Go to Dashboard
             </Button>
           </>
@@ -56,7 +56,7 @@ const SubscriptionSuccess = () => {
           <>
             <h1 className="text-2xl font-bold text-zinc-100 mb-2">Almost there</h1>
             <p className="text-zinc-400 mb-6">Payment is processing. Your account will be upgraded shortly.</p>
-            <Button onClick={() => navigate("/dashboard")} className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold px-8">
+            <Button onClick={() => navigate("/dashboard")} className="bg-gold text-zinc-900 hover:bg-fire-hover font-semibold px-8">
               Continue to Dashboard
             </Button>
           </>
@@ -70,7 +70,7 @@ const SubscriptionSuccess = () => {
         )}
 
         <div className="mt-8 flex items-center justify-center gap-2">
-          <ChefHat className="w-4 h-4 text-[#d4af37]" />
+          <ChefHat className="w-4 h-4 text-gold" />
           <span className="text-sm text-zinc-600">Restaurateur Pro</span>
         </div>
       </div>

@@ -1,12 +1,12 @@
 # Restaurateur Pro - Product Requirements Document
 
 ## Original Problem Statement
-Build full stack, all live, emergent support - Restaurateur Pro restaurant management platform
+Build a full-stack, live Restaurateur Pro restaurant management platform.
 
 ## User Choices
 - All live features (real-time data, live map, real-time notifications)
 - AI-powered features using GPT-5.2
-- Emergent-managed Google social login
+- Google social login
 - Match exact dark theme from uploaded HTML design
 
 ## User Personas
@@ -16,7 +16,7 @@ Build full stack, all live, emergent support - Restaurateur Pro restaurant manag
 
 ## Core Requirements (Static)
 - 6 Dashboard Modules: Command Center, Site Strategist, Ground Up, Ops Launchpad, Expansion Toolkit, Lease Negotiation
-- Emergent Google OAuth Authentication
+- Google OAuth authentication
 - GPT-5.2 AI Integration (lease analysis, cost calculator)
 - Live demographics data
 - Interactive OpenStreetMap integration
@@ -25,7 +25,7 @@ Build full stack, all live, emergent support - Restaurateur Pro restaurant manag
 ## What's Been Implemented (Jan 2026)
 
 ### Backend (FastAPI + MongoDB)
-- ✅ Complete auth system with Emergent Google OAuth
+- ✅ Complete auth system with Google OAuth
 - ✅ Projects CRUD with user association
 - ✅ Tasks management with status tracking
 - ✅ Team members management
