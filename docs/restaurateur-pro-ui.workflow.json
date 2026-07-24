@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Restaurateur Pro UI System",
+    "subtitle": "Operator path from access to an accountable next action",
+    "output": "docs/restaurateur-pro-ui-workflow.html"
+  },
+  "lanes": [
+    { "id": "entry", "label": "Entry + Context" },
+    { "id": "workspace", "label": "Operator Workbench" },
+    { "id": "modules", "label": "Specialist Modules" },
+    { "id": "outcome", "label": "Operational Outcome" }
+  ],
+  "phases": [
+    { "id": "orient", "label": "Orient", "fromCol": 0, "toCol": 1 },
+    { "id": "decide", "label": "Select + decide", "fromCol": 2, "toCol": 4, "variant": "emphasis" },
+    { "id": "advance", "label": "Advance", "fromCol": 5, "toCol": 5 }
+  ],
+  "groups": [
+    { "id": "specialists", "label": "One shell, eight work areas", "lane": "modules", "fromCol": 2, "toCol": 4, "variant": "emphasis" }
+  ],
+  "mainPath": ["access", "onboarding", "project", "module", "action", "progress"],
+  "nodes": [
+    { "id": "access", "lane": "entry", "col": 0, "type": "external", "label": "Access", "sublabel": "sign in or register" },
+    { "id": "onboarding", "lane": "entry", "col": 1, "type": "frontend", "label": "Onboarding", "sublabel": "restaurant context" },
+    { "id": "project", "lane": "workspace", "col": 2, "type": "frontend", "label": "Active Project", "sublabel": "scope + location" },
+    { "id": "module", "lane": "modules", "col": 2, "type": "backend", "label": "Module", "sublabel": "specialist workspace" },
+    { "id": "action", "lane": "modules", "col": 4, "type": "messagebus", "label": "Next Action", "sublabel": "review or execute" },
+    { "id": "progress", "lane": "outcome", "col": 5, "type": "database", "label": "Project State", "sublabel": "decision recorded" },
+    { "id": "alerts", "lane": "workspace", "col": 4, "type": "security", "label": "Alerts", "sublabel": "exceptions + risk" },
+    { "id": "search", "lane": "workspace", "col": 0, "type": "frontend", "label": "Global Search", "sublabel": "workspace lookup", "width": 88 }
+  ],
+  "edges": [
+    { "from": "access", "to": "onboarding" },
+    { "from": "onboarding", "to": "project", "label": "context ready", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 1 },
+    { "from": "project", "to": "module", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "drop" },
+    { "from": "module", "to": "action" },
+    { "from": "action", "to": "progress", "label": "save result", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 1 },
+    { "from": "project", "to": "search", "variant": "dashed", "role": "branch" },
+    { "from": "alerts", "to": "action", "label": "priority signal", "variant": "security", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 1 }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Shell Contract",
+      "items": [
+        "Project context remains visible",
+        "Modules share one navigation model",
+        "Search and alerts stay globally available"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Design Contract",
+      "items": [
+        "Operational data is the visual",
+        "Fire Orange marks action and focus",
+        "Mobile preserves complete module access"
+      ]
+    }
+  ]
+}

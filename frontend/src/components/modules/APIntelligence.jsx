@@ -356,25 +356,25 @@ const APIntelligence = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-9 h-9 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center">
-              <Brain className="w-5 h-5 text-[#d4af37]" />
+            <div className="w-9 h-9 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center">
+              <Brain className="w-5 h-5 text-gold" />
             </div>
             <h1 className="text-2xl md:text-3xl font-heading font-bold text-zinc-100">AP Intelligence Engine</h1>
           </div>
           <p className="text-zinc-400 ml-12 text-sm">Restaurant Financial OS · Invoices · Vendors · Approvals · Cash Flow · AI Insights</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="px-4 py-2 rounded-lg bg-[#18181b] border border-zinc-800/50 text-center">
+          <div className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800/50 text-center">
             <p className="text-xl font-heading font-bold text-zinc-100">{fmt(displayDashboard.total_unpaid)}</p>
             <p className="text-xs text-zinc-500">Total AP</p>
           </div>
-          <div className="px-4 py-2 rounded-lg bg-[#18181b] border border-zinc-800/50 text-center">
+          <div className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800/50 text-center">
             <p className={`text-xl font-heading font-bold ${displayDashboard.total_alert_count > 0 ? "text-amber" : "text-emerald"}`}>
               {displayDashboard.total_alert_count}
             </p>
             <p className="text-xs text-zinc-500">Alerts</p>
           </div>
-          <Button onClick={() => setShowAddInvoice(true)} className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]">
+          <Button onClick={() => setShowAddInvoice(true)} className="bg-gold text-zinc-900 hover:bg-fire-hover">
             <Upload className="w-4 h-4 mr-2" />
             Add Invoice
           </Button>
@@ -409,13 +409,13 @@ const APIntelligence = () => {
         <div className="space-y-6">
 
           {/* Captain Culinary AI Banner */}
-          <div className="p-4 rounded-xl bg-gradient-to-r from-[#d4af37]/5 via-transparent to-transparent border border-[#d4af37]/20">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-gold/5 via-transparent to-transparent border border-gold/20">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Sparkles className="w-4 h-4 text-[#d4af37]" />
+              <div className="w-8 h-8 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Sparkles className="w-4 h-4 text-gold" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-[#d4af37] font-semibold tracking-wide mb-1">CAPTAIN CULINARY · AI Financial Advisor</p>
+                <p className="text-xs text-gold font-semibold tracking-wide mb-1">CAPTAIN CULINARY · AI Financial Advisor</p>
                 {aiInsight ? (
                   <p className="text-sm text-zinc-200 leading-relaxed">{aiInsight}</p>
                 ) : (
@@ -427,7 +427,7 @@ const APIntelligence = () => {
                 disabled={generatingInsight}
                 size="sm"
                 variant="outline"
-                className="flex-shrink-0 border-[#d4af37]/30 text-[#d4af37] hover:bg-[#d4af37]/10"
+                className="flex-shrink-0 border-gold/30 text-gold hover:bg-gold/10"
               >
                 {generatingInsight ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
               </Button>
@@ -442,7 +442,7 @@ const APIntelligence = () => {
               { label: "Pending Approval",   value: displayDashboard.pending_approval_count,      Icon: Clock,       color: "text-azure",     sub: "Awaiting sign-off" },
               { label: "Active Vendors",     value: displayDashboard.vendor_count,                Icon: Building2,   color: "text-emerald",   sub: "AP relationships" },
             ].map((m, i) => (
-              <Card key={i} className={`bg-[#18181b] border-zinc-800/50 ${m.urgent ? "border-amber/30" : ""}`}>
+              <Card key={i} className={`bg-zinc-900 border-zinc-800/50 ${m.urgent ? "border-amber/30" : ""}`}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs text-zinc-500 uppercase tracking-wider">{m.label}</p>
@@ -480,7 +480,7 @@ const APIntelligence = () => {
 
           {/* Recent Invoices + Active Alerts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="bg-[#18181b] border-zinc-800/50">
+            <Card className="bg-zinc-900 border-zinc-800/50">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-heading text-zinc-100 flex items-center gap-2">
@@ -517,7 +517,7 @@ const APIntelligence = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-[#18181b] border-zinc-800/50">
+            <Card className="bg-zinc-900 border-zinc-800/50">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-heading text-zinc-100 flex items-center gap-2">
@@ -553,7 +553,7 @@ const APIntelligence = () => {
           </div>
 
           {/* Largest Open Invoices */}
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-heading text-zinc-100 flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-gold" />Largest Open Invoices
@@ -623,7 +623,7 @@ const APIntelligence = () => {
             </div>
           </div>
 
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="table-dark w-full">
@@ -701,7 +701,7 @@ const APIntelligence = () => {
               const score = vendor.reliability_score || 85;
               const stars = Math.round(score / 20);
               return (
-                <Card key={vendor.vendor_id} className="bg-[#18181b] border-zinc-800/50 hover:border-zinc-700 transition-colors">
+                <Card key={vendor.vendor_id} className="bg-zinc-900 border-zinc-800/50 hover:border-zinc-700 transition-colors">
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -767,7 +767,7 @@ const APIntelligence = () => {
                 const priorityLabel = ["", "Urgent", "High", "Medium", "Low"][inv.payment_priority || 3] || "Medium";
                 const priorityCls   = inv.payment_priority === 1 ? "badge-fire" : inv.payment_priority === 2 ? "badge-amber" : "badge-blue";
                 return (
-                  <Card key={inv.invoice_id} className="bg-[#18181b] border-zinc-800/50">
+                  <Card key={inv.invoice_id} className="bg-zinc-900 border-zinc-800/50">
                     <CardContent className="p-4">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-start gap-4">
@@ -832,7 +832,7 @@ const APIntelligence = () => {
               { label: "Overdue",               value: fmt(displayCashFlow.overdue_total), Icon: AlertTriangle, color: "text-fire", urgent: displayCashFlow.overdue_count > 0 },
               { label: "Cash Pressure Score",   value: `${displayCashFlow.cash_pressure_score}/100`, Icon: BarChart3, color: displayCashFlow.cash_pressure_score > 50 ? "text-fire" : "text-amber" },
             ].map((m, i) => (
-              <Card key={i} className={`bg-[#18181b] ${m.urgent ? "border-fire/30" : "border-zinc-800/50"}`}>
+              <Card key={i} className={`bg-zinc-900 ${m.urgent ? "border-fire/30" : "border-zinc-800/50"}`}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs text-zinc-500 uppercase tracking-wider">{m.label}</p>
@@ -846,7 +846,7 @@ const APIntelligence = () => {
           </div>
 
           {/* Weekly Forecast */}
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-heading text-zinc-100 flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-azure" />Weekly Payment Forecast
@@ -875,7 +875,7 @@ const APIntelligence = () => {
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+                        <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pct}%` }} />
                       </div>
                       <span className="text-xs text-zinc-500 w-20 text-right">{week.count} invoice{week.count !== 1 ? "s" : ""}</span>
                     </div>
@@ -886,7 +886,7 @@ const APIntelligence = () => {
           </Card>
 
           {/* Upcoming Payables */}
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-heading text-zinc-100 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-gold" />Upcoming Payables
@@ -954,7 +954,7 @@ const APIntelligence = () => {
               {displayAlerts.map((alert) => {
                 const { cls, Icon, color } = getSeverityMeta(alert.severity);
                 return (
-                  <Card key={alert.alert_id} className={`bg-[#18181b] ${alert.severity === "error" ? "border-fire/30" : "border-amber/20"}`}>
+                  <Card key={alert.alert_id} className={`bg-zinc-900 ${alert.severity === "error" ? "border-fire/30" : "border-amber/20"}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${alert.severity === "error" ? "bg-fire/10" : "bg-amber/10"}`}>
@@ -986,7 +986,7 @@ const APIntelligence = () => {
           )}
 
           {/* Fraud & Risk Detection Rules */}
-          <Card className="bg-[#18181b] border-zinc-800/50 mt-6">
+          <Card className="bg-zinc-900 border-zinc-800/50 mt-6">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-heading text-zinc-100 flex items-center gap-2">
                 <Zap className="w-4 h-4 text-gold" />Fraud & Risk Detection Rules
@@ -1095,7 +1095,7 @@ const APIntelligence = () => {
               )}
               {selectedInvoice.status === "approved" && (
                 <Button onClick={() => handleInvoiceAction(selectedInvoice.invoice_id, "schedule")}
-                  className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]">
+                  className="bg-gold text-zinc-900 hover:bg-fire-hover">
                   <Calendar className="w-4 h-4 mr-1" />Schedule for Payment
                 </Button>
               )}
@@ -1178,7 +1178,7 @@ const APIntelligence = () => {
               />
             </div>
 
-            <div className="p-3 rounded-lg bg-[#d4af37]/5 border border-[#d4af37]/20">
+            <div className="p-3 rounded-lg bg-gold/5 border border-gold/20">
               <p className="text-xs text-zinc-400 flex items-center gap-1.5">
                 <Sparkles className="w-3 h-3 text-gold" />
                 AI OCR extraction coming soon — upload a PDF or invoice image for automatic field detection and line-item parsing.
@@ -1191,7 +1191,7 @@ const APIntelligence = () => {
               onClick={() => setShowAddInvoice(false)}>
               Cancel
             </Button>
-            <Button className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]" onClick={submitAddInvoice} disabled={addingInvoice}>
+            <Button className="bg-gold text-zinc-900 hover:bg-fire-hover" onClick={submitAddInvoice} disabled={addingInvoice}>
               {addingInvoice ? <RefreshCw className="w-4 h-4 animate-spin mr-1" /> : <Upload className="w-4 h-4 mr-1" />}
               Add Invoice
             </Button>

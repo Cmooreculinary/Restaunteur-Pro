@@ -26,16 +26,16 @@ const DonationSuccess = () => {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center px-4">
+    <div className="public-page status-page min-h-screen bg-background flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center">
+          <div className="w-20 h-20 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center">
             {status === "loading" ? (
-              <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
             ) : status === "success" ? (
-              <Heart className="w-10 h-10 text-[#d4af37]" />
+              <Heart className="w-10 h-10 text-gold" />
             ) : (
-              <CheckCircle className="w-10 h-10 text-[#d4af37]" />
+              <CheckCircle className="w-10 h-10 text-gold" />
             )}
           </div>
         </div>
@@ -46,7 +46,7 @@ const DonationSuccess = () => {
           <>
             <h1 className="text-3xl font-bold text-zinc-100 mb-2">Thank You!</h1>
             {amount && (
-              <p className="text-[#d4af37] text-xl font-semibold mb-3">${amount} donated</p>
+              <p className="text-gold text-xl font-semibold mb-3">${amount} donated</p>
             )}
             <p className="text-zinc-400 mb-8 leading-relaxed">
               Your generosity helps us keep Restaurateur Pro running and building tools
@@ -54,7 +54,7 @@ const DonationSuccess = () => {
             </p>
             <div className="flex flex-col gap-3">
               <Link to="/dashboard">
-                <Button className="w-full bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold">
+                <Button className="w-full bg-gold text-zinc-900 hover:bg-fire-hover font-semibold">
                   Back to Dashboard
                 </Button>
               </Link>
@@ -71,7 +71,7 @@ const DonationSuccess = () => {
           <>
             <h1 className="text-2xl font-bold text-zinc-100 mb-2">Almost there!</h1>
             <p className="text-zinc-400 mb-6">Your payment is processing — thank you so much.</p>
-            <Link to="/"><Button className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]">Go Home</Button></Link>
+            <Link to="/"><Button className="bg-gold text-zinc-900 hover:bg-fire-hover">Go Home</Button></Link>
           </>
         )}
 
@@ -84,7 +84,7 @@ const DonationSuccess = () => {
         )}
 
         <div className="mt-8 flex items-center justify-center gap-2">
-          <ChefHat className="w-4 h-4 text-[#d4af37]" />
+          <ChefHat className="w-4 h-4 text-gold" />
           <span className="text-sm text-zinc-600">Restaurateur Pro</span>
         </div>
       </div>

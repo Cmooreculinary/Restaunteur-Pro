@@ -116,19 +116,19 @@ const SiteStrategist = ({ project }) => {
                 className="pl-9 bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500"
               />
             </div>
-            <Button onClick={handleSearch} className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]">
+            <Button onClick={handleSearch} className="bg-gold text-zinc-900 hover:bg-fire-hover">
               Search
             </Button>
           </div>
 
           {/* Map */}
-          <Card className="bg-[#18181b] border-zinc-800/50 overflow-hidden h-[calc(100%-60px)]">
+          <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden h-[calc(100%-60px)]">
             <div className="h-full rounded-lg overflow-hidden">
               <MapContainer
                 center={mapCenter}
                 zoom={14}
                 className="h-full w-full"
-                style={{ background: "#18181b" }}
+                style={{ background: "var(--color-paper-2)" }}
               >
                 <TileLayer
                   url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -151,10 +151,10 @@ const SiteStrategist = ({ project }) => {
         {/* Right Panel - Demographics & Lease */}
         <div className="space-y-6 overflow-auto">
           {/* Demographics Card */}
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-[#d4af37]" />
+                <MapPin className="w-5 h-5 text-gold" />
                 Demographic Insights
               </CardTitle>
               <p className="text-xs text-zinc-500">Live data • Updated just now</p>
@@ -198,7 +198,7 @@ const SiteStrategist = ({ project }) => {
               <div className="p-3 rounded-lg bg-zinc-900/50">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-[#d4af37]" />
+                    <DollarSign className="w-4 h-4 text-gold" />
                     <span className="text-sm text-zinc-400">Median Income</span>
                   </div>
                   <Badge className="badge-green">{demographics?.income?.trend || "+4.1%"}</Badge>
@@ -231,7 +231,7 @@ const SiteStrategist = ({ project }) => {
           </Card>
 
           {/* Lease Analyzer */}
-          <Card className="bg-[#18181b] border-zinc-800/50">
+          <Card className="bg-zinc-900 border-zinc-800/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-heading text-zinc-100 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-amber" />
@@ -262,15 +262,15 @@ const SiteStrategist = ({ project }) => {
                 data-testid="ai-analyze-lease-btn"
                 onClick={analyzeLeaseWithAI}
                 disabled={analyzing}
-                className="w-full bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030]"
+                className="w-full bg-gold text-zinc-900 hover:bg-fire-hover"
               >
                 <Sparkles className={`w-4 h-4 mr-2 ${analyzing ? "animate-pulse" : ""}`} />
                 {analyzing ? "Analyzing..." : "AI Lease Analysis"}
               </Button>
 
               {leaseAnalysis && (
-                <div className="p-4 rounded-lg bg-zinc-900 border border-[#d4af37]/20 mt-4">
-                  <p className="text-xs text-[#d4af37] font-medium mb-2">AI Analysis Result</p>
+                <div className="p-4 rounded-lg bg-zinc-900 border border-gold/20 mt-4">
+                  <p className="text-xs text-gold font-medium mb-2">AI Analysis Result</p>
                   <p className="text-sm text-zinc-300 whitespace-pre-wrap">{leaseAnalysis}</p>
                 </div>
               )}

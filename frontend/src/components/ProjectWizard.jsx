@@ -66,12 +66,12 @@ export default function ProjectWizard({ open, onClose, onCreated }) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="bg-[#18181b]/95 backdrop-blur-xl border-zinc-800/80 text-zinc-100 sm:max-w-md p-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/5 via-transparent to-transparent pointer-events-none" />
+      <DialogContent className="bg-zinc-900/95 backdrop-blur-xl border-zinc-800/80 text-zinc-100 sm:max-w-md p-0 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-transparent pointer-events-none" />
         <DialogHeader className="px-6 pt-6 pb-2 relative">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-heading font-bold flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#d4af37]" />
+              <Sparkles className="w-5 h-5 text-gold" />
               New Project
             </DialogTitle>
             <Button
@@ -89,12 +89,12 @@ export default function ProjectWizard({ open, onClose, onCreated }) {
               <div key={s.id} className="flex-1 flex flex-col items-center gap-1">
                 <div
                   className={`w-full h-1 rounded-full transition-colors ${
-                    step >= s.id ? "bg-[#d4af37]" : "bg-zinc-800"
+                    step >= s.id ? "bg-gold" : "bg-zinc-800"
                   }`}
                 />
                 <span
                   className={`text-[10px] uppercase tracking-wider ${
-                    step >= s.id ? "text-[#d4af37]" : "text-zinc-600"
+                    step >= s.id ? "text-gold" : "text-zinc-600"
                   }`}
                 >
                   {s.title.split(" ")[0]}
@@ -107,8 +107,8 @@ export default function ProjectWizard({ open, onClose, onCreated }) {
         <div className="px-6 py-6 relative min-h-[200px]">
           {step === 1 && (
             <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="w-12 h-12 rounded-xl bg-[#d4af37]/10 flex items-center justify-center mb-2">
-                <ChefHat className="w-6 h-6 text-[#d4af37]" />
+              <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center mb-2">
+                <ChefHat className="w-6 h-6 text-gold" />
               </div>
               <Label className="text-zinc-400 text-sm">Restaurant Name</Label>
               <Input
@@ -125,8 +125,8 @@ export default function ProjectWizard({ open, onClose, onCreated }) {
 
           {step === 2 && (
             <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="w-12 h-12 rounded-xl bg-[#d4af37]/10 flex items-center justify-center mb-2">
-                <MapPin className="w-6 h-6 text-[#d4af37]" />
+              <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center mb-2">
+                <MapPin className="w-6 h-6 text-gold" />
               </div>
               <Label className="text-zinc-400 text-sm">Location / City</Label>
               <Input
@@ -143,8 +143,8 @@ export default function ProjectWizard({ open, onClose, onCreated }) {
 
           {step === 3 && (
             <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="w-12 h-12 rounded-xl bg-[#d4af37]/10 flex items-center justify-center mb-2">
-                <DollarSign className="w-6 h-6 text-[#d4af37]" />
+              <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center mb-2">
+                <DollarSign className="w-6 h-6 text-gold" />
               </div>
               <Label className="text-zinc-400 text-sm">Total Budget (optional)</Label>
               <div className="relative">
@@ -182,7 +182,7 @@ export default function ProjectWizard({ open, onClose, onCreated }) {
             <Button
               onClick={() => setStep(step + 1)}
               disabled={!canNext()}
-              className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold"
+              className="bg-gold text-zinc-900 hover:bg-fire-hover font-semibold"
             >
               Continue <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
@@ -190,7 +190,7 @@ export default function ProjectWizard({ open, onClose, onCreated }) {
             <Button
               onClick={handleCreate}
               disabled={loading || !form.name.trim()}
-              className="bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold min-w-[140px]"
+              className="bg-gold text-zinc-900 hover:bg-fire-hover font-semibold min-w-[140px]"
             >
               {loading ? "Creating..." : "Create Project"}
             </Button>

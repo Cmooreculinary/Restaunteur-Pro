@@ -51,11 +51,11 @@ const Donations = ({ user }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f10]">
+    <div className="public-page donations-page min-h-screen bg-background">
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-zinc-800">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#d4af37] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center">
             <ChefHat className="w-4 h-4 text-zinc-900" />
           </div>
           <span className="font-bold text-zinc-100">Restaurateur Pro</span>
@@ -71,8 +71,8 @@ const Donations = ({ user }) => {
       <div className="max-w-2xl mx-auto px-6 py-16">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="w-16 h-16 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center mx-auto mb-4">
-            <Heart className="w-8 h-8 text-[#d4af37]" />
+          <div className="w-16 h-16 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center mx-auto mb-4">
+            <Heart className="w-8 h-8 text-gold" />
           </div>
           <h1 className="text-3xl font-bold text-zinc-100 mb-3">Support the Community</h1>
           <p className="text-zinc-400 max-w-md mx-auto leading-relaxed">
@@ -96,22 +96,22 @@ const Donations = ({ user }) => {
                   <button
                     key={preset.value}
                     onClick={() => { setSelectedAmount(preset.value); setCustomAmount(""); }}
-                    className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
+                    className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-colors ${
                       active
-                        ? "border-[#d4af37] bg-[#d4af37]/5"
+                        ? "border-gold bg-gold/5"
                         : "border-zinc-800 hover:border-zinc-700 bg-zinc-800/30"
                     }`}
                   >
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${active ? "bg-[#d4af37]/20" : "bg-zinc-800"}`}>
-                      <Icon className={`w-4 h-4 ${active ? "text-[#d4af37]" : "text-zinc-500"}`} />
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${active ? "bg-gold/20" : "bg-zinc-800"}`}>
+                      <Icon className={`w-4 h-4 ${active ? "text-gold" : "text-zinc-500"}`} />
                     </div>
                     <div>
-                      <span className={`text-lg font-bold block ${active ? "text-[#d4af37]" : "text-zinc-100"}`}>
+                      <span className={`text-lg font-bold block ${active ? "text-gold" : "text-zinc-100"}`}>
                         {preset.label}
                       </span>
                       <span className="text-xs text-zinc-500">{preset.desc}</span>
                     </div>
-                    {active && <CheckCircle className="w-4 h-4 text-[#d4af37] ml-auto" />}
+                    {active && <CheckCircle className="w-4 h-4 text-gold ml-auto" />}
                   </button>
                 );
               })}
@@ -158,7 +158,7 @@ const Donations = ({ user }) => {
           <Button
             onClick={handleDonate}
             disabled={!finalAmount || finalAmount < 1 || loading}
-            className="w-full bg-[#d4af37] text-zinc-900 hover:bg-[#c4a030] font-semibold py-6 text-lg"
+            className="w-full bg-gold text-zinc-900 hover:bg-fire-hover font-semibold py-6 text-lg"
           >
             {loading ? (
               "Redirecting to payment..."
@@ -190,7 +190,7 @@ const Donations = ({ user }) => {
             const Icon = item.icon;
             return (
               <div key={item.label} className="text-center p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
-                <Icon className="w-5 h-5 text-[#d4af37] mx-auto mb-2" />
+                <Icon className="w-5 h-5 text-gold mx-auto mb-2" />
                 <p className="text-sm font-bold text-zinc-100">{item.label}</p>
                 <p className="text-xs text-zinc-500 mt-0.5">{item.desc}</p>
               </div>
