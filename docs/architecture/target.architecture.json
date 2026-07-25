@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Restaunteur Pro — Target Architecture",
+    "subtitle": "Controlled modernization without an unapproved database replacement",
+    "output": "target-architecture.html"
+  },
+  "components": [
+    {"id":"operator","type":"external","label":"Operator","sublabel":"Browser","pos":[35,285],"size":[120,60]},
+    {"id":"frontend","type":"frontend","label":"React Frontend","sublabel":"Vite + Trench Design","pos":[205,285],"size":[150,60],"tag":"Render static"},
+    {"id":"client","type":"frontend","label":"API Client","sublabel":"typed contracts","pos":[405,285],"size":[130,60]},
+    {"id":"routers","type":"backend","label":"API Routers","sublabel":"FastAPI","pos":[585,285],"size":[130,60]},
+    {"id":"services","type":"backend","label":"Services","sublabel":"domain rules","pos":[765,285],"size":[130,60]},
+    {"id":"repos","type":"backend","label":"Repositories","sublabel":"data boundary","pos":[945,285],"size":[130,60]},
+    {"id":"db","type":"database","label":"SQLite","sublabel":"migration-managed","pos":[945,470],"size":[135,60],"tag":"approved current"},
+    {"id":"auth","type":"security","label":"Session Security","sublabel":"cookie + CSRF","pos":[585,90],"size":[140,60]},
+    {"id":"integrations","type":"external","label":"Integrations","sublabel":"Stripe + AI + Google","pos":[765,470],"size":[150,60]},
+    {"id":"telemetry","type":"cloud","label":"Observability","sublabel":"logs + request IDs","pos":[765,90],"size":[145,60]}
+  ],
+  "boundaries": [
+    {"kind":"region","label":"Render Blueprint","wraps":["frontend","client","routers","services","repos","db","auth","telemetry"],"pad":28},
+    {"kind":"security-group","label":"Server trust boundary","wraps":["routers","services","repos","auth"],"pad":18}
+  ],
+  "connections": [
+    {"from":"operator","to":"frontend","label":"HTTPS","variant":"emphasis"},
+    {"from":"frontend","to":"client"},
+    {"from":"client","to":"routers","label":"cookie + CSRF","variant":"security","labelAt":[560,359]},
+    {"from":"routers","to":"services"},
+    {"from":"services","to":"repos"},
+    {"from":"repos","to":"db","label":"versioned SQL","fromSide":"bottom","toSide":"top","route":"orthogonal-v","labelAt":[1011,359]},
+    {"from":"auth","to":"routers","label":"session","variant":"security","fromSide":"bottom","toSide":"top"},
+    {"from":"services","to":"integrations","label":"bounded adapters","variant":"dashed","fromSide":"bottom","toSide":"top"},
+    {"from":"routers","to":"telemetry","label":"request ID","variant":"dashed","fromSide":"top","toSide":"bottom"}
+  ],
+  "cards": [
+    {"dot":"cyan","title":"Frontend","items":["Vite build isolated from redesign","Locked Trench Design tokens and complete states"]},
+    {"dot":"emerald","title":"Backend","items":["Routers, services, and repositories separated","Versioned migrations and contract tests"]},
+    {"dot":"rose","title":"Security","items":["HTTP-only session cookie","CSRF protection and no browser-stored bearer token"]}
+  ]
+}

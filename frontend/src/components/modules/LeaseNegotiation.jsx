@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -19,21 +19,22 @@ const LeaseNegotiation = ({ project }) => {
   const [aiInput, setAiInput] = useState("");
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const projectId = project?.project_id;
 
-  useEffect(() => {
-    if (project?.project_id) {
-      fetchClauses();
-    }
-  }, [project?.project_id]);
-
-  const fetchClauses = async () => {
+  const fetchClauses = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/lease-clauses?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/lease-clauses?project_id=${projectId}`);
       setClauses(response.data);
     } catch (error) {
       console.error("Error fetching clauses:", error);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchClauses();
+    }
+  }, [fetchClauses, projectId]);
 
   const analyzeWithAI = async () => {
     if (!aiInput.trim()) {

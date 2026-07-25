@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -24,41 +24,42 @@ const OpsLaunchpad = ({ project }) => {
   const [costInput, setCostInput] = useState("");
   const [costResult, setCostResult] = useState(null);
   const [calculating, setCalculating] = useState(false);
+  const projectId = project?.project_id;
 
-  useEffect(() => {
-    if (project?.project_id) {
-      fetchCandidates();
-      fetchVendors();
-      fetchMenuItems();
-    }
-  }, [project?.project_id]);
-
-  const fetchCandidates = async () => {
+  const fetchCandidates = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/candidates?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/candidates?project_id=${projectId}`);
       setCandidates(response.data);
     } catch (error) {
       console.error("Error fetching candidates:", error);
     }
-  };
+  }, [projectId]);
 
-  const fetchVendors = async () => {
+  const fetchVendors = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/vendors?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/vendors?project_id=${projectId}`);
       setVendors(response.data);
     } catch (error) {
       console.error("Error fetching vendors:", error);
     }
-  };
+  }, [projectId]);
 
-  const fetchMenuItems = async () => {
+  const fetchMenuItems = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/menu-items?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/menu-items?project_id=${projectId}`);
       setMenuItems(response.data);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchCandidates();
+      fetchVendors();
+      fetchMenuItems();
+    }
+  }, [fetchCandidates, fetchMenuItems, fetchVendors, projectId]);
 
   const calculateCost = async () => {
     if (!costInput.trim()) {

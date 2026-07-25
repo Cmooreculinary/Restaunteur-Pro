@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -32,11 +32,7 @@ const SiteStrategist = ({ project }) => {
   const [analyzing, setAnalyzing] = useState(false);
   const [leaseAnalysis, setLeaseAnalysis] = useState(null);
 
-  useEffect(() => {
-    fetchDemographics();
-  }, []);
-
-  const fetchDemographics = async () => {
+  const fetchDemographics = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API}/site/demographics?lat=${mapCenter[0]}&lng=${mapCenter[1]}`);
@@ -46,7 +42,11 @@ const SiteStrategist = ({ project }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [mapCenter]);
+
+  useEffect(() => {
+    fetchDemographics();
+  }, [fetchDemographics]);
 
   const handleSearch = () => {
     // Simulated geocoding

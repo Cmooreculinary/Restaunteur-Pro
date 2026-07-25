@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -18,41 +18,42 @@ const CommandCenter = ({ project, onProjectUpdate }) => {
   const [tasks, setTasks] = useState([]);
   const [team, setTeam] = useState([]);
   const [budget, setBudget] = useState([]);
+  const projectId = project?.project_id;
 
-  useEffect(() => {
-    if (project?.project_id) {
-      fetchTasks();
-      fetchTeam();
-      fetchBudget();
-    }
-  }, [project?.project_id]);
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/tasks?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/tasks?project_id=${projectId}`);
       setTasks(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
-  };
+  }, [projectId]);
 
-  const fetchTeam = async () => {
+  const fetchTeam = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/team?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/team?project_id=${projectId}`);
       setTeam(response.data);
     } catch (error) {
       console.error("Error fetching team:", error);
     }
-  };
+  }, [projectId]);
 
-  const fetchBudget = async () => {
+  const fetchBudget = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/budget?project_id=${project.project_id}`);
+      const response = await axios.get(`${API}/budget?project_id=${projectId}`);
       setBudget(response.data);
     } catch (error) {
       console.error("Error fetching budget:", error);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchTasks();
+      fetchTeam();
+      fetchBudget();
+    }
+  }, [fetchBudget, fetchTasks, fetchTeam, projectId]);
 
   const phases = [
     { id: "concept", label: "Concept", complete: true },
