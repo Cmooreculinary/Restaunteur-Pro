@@ -25,6 +25,21 @@ operational decision and act on it without losing project context.
 - Content and transaction pages: Long Document rhythm with the same tokens and
   compact N9 navigation.
 
+## Studied workspace DNA
+
+Macro (`https://macro.com`) is the structural reference for the authenticated
+workspace. Restaurateur Pro adopts its unified-workspace logic, quiet utility
+chrome, keyboard-first retrieval, linked-object navigation, and product-led
+information density. It does not copy Macro's branding, copy, illustrations, or
+pixels. The Trench palette, typography, geometry, and restaurant operating model
+remain authoritative.
+
+- Navigation groups related disciplines instead of presenting a flat app list.
+- Project and module context remain visible in the persistent shell.
+- `Command/Ctrl + K` opens cross-workspace retrieval.
+- Operational records, not decorative cards, carry the visual hierarchy.
+- Overlays use restrained elevation; primary work surfaces remain flat.
+
 ## Theme
 
 - Paper: Obsidian `#0D0D0D`
