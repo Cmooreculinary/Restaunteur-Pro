@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import {
   ChefHat, LayoutDashboard, Map, Hammer, Rocket, TrendingUp, FileText,
   Megaphone, Brain, Bell, Search, LogOut, Settings, User, Plus, ChevronRight, ChevronDown,
-  AlertTriangle, CheckCircle, Clock, ArrowUpRight, ArrowDownRight, X
+  AlertTriangle, CheckCircle, Clock, ArrowUpRight, ArrowDownRight, X, Command
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,7 @@ const Dashboard = ({ user, setUser }) => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showCommand, setShowCommand] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
 
   // Fetch projects
@@ -120,6 +121,39 @@ const Dashboard = ({ user, setUser }) => {
     { id: "ap", icon: Brain, label: "AP Intelligence" },
   ];
   const activeModule = modules.find((module) => module.id === activeTab);
+  const commandResults = [
+    ...modules.map((module) => ({ ...module, type: "Workspace" })),
+    ...projects.map((project) => ({
+      id: project.project_id,
+      label: project.name,
+      type: "Project",
+      project,
+      icon: ChefHat,
+    })),
+  ].filter((item) => item.label.toLowerCase().includes(searchQuery.trim().toLowerCase()));
+
+  useEffect(() => {
+    const handleCommandKey = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setShowCommand((open) => !open);
+      }
+      if (event.key === "Escape") setShowCommand(false);
+    };
+    window.addEventListener("keydown", handleCommandKey);
+    return () => window.removeEventListener("keydown", handleCommandKey);
+  }, []);
+
+  const selectCommandResult = (item) => {
+    if (item.type === "Project") {
+      setActiveProject(item.project);
+      setActiveTab("command");
+    } else {
+      setActiveTab(item.id);
+    }
+    setSearchQuery("");
+    setShowCommand(false);
+  };
 
   return (
     <div className="app-shell min-h-screen bg-background">
@@ -129,7 +163,21 @@ const Dashboard = ({ user, setUser }) => {
           <span>Restaurateur<br />Pro</span>
         </div>
         <nav className="app-rail-nav" aria-label="Operations modules">
-          {modules.map((module) => (
+          <span className="app-rail-section">Workspaces</span>
+          {modules.slice(0, 4).map((module) => (
+            <button
+              key={module.id}
+              data-testid={`tab-${module.id}`}
+              onClick={() => setActiveTab(module.id)}
+              className={activeTab === module.id ? "is-active" : ""}
+              aria-current={activeTab === module.id ? "page" : undefined}
+            >
+              <module.icon aria-hidden="true" />
+              <span>{module.label}</span>
+            </button>
+          ))}
+          <span className="app-rail-section">Intelligence</span>
+          {modules.slice(4).map((module) => (
             <button
               key={module.id}
               data-testid={`tab-${module.id}`}
@@ -151,7 +199,7 @@ const Dashboard = ({ user, setUser }) => {
       <div className="app-stage">
         <header className="app-topbar">
           <div className="app-context">
-            <span className="app-context-label">Current workspace</span>
+            <span className="app-context-label">{activeProject?.name || "Restaurant workspace"}</span>
             <strong>{activeModule?.label}</strong>
           </div>
           <div className="app-actions">
@@ -175,17 +223,16 @@ const Dashboard = ({ user, setUser }) => {
                 <Plus className="w-4 h-4" /> New project
               </Button>
             </div>
-            <div className="app-search hidden xl:flex">
+            <button
+              type="button"
+              className="app-search hidden xl:flex"
+              onClick={() => setShowCommand(true)}
+              aria-label="Open workspace search"
+            >
               <Search aria-hidden="true" />
-              <Input
-                data-testid="global-search"
-                aria-label="Search workspace"
-                placeholder="Search workspace"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+              <span>Search projects and workspaces</span>
               <kbd>⌘K</kbd>
-            </div>
+            </button>
             <div className="relative">
               <Button
                 data-testid="notifications-btn"
@@ -294,6 +341,46 @@ const Dashboard = ({ user, setUser }) => {
           ) : null}
         </main>
       </div>
+
+      {showCommand && (
+        <div className="command-backdrop" role="presentation" onMouseDown={() => setShowCommand(false)}>
+          <section
+            className="command-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search workspace"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="command-input">
+              <Command aria-hidden="true" />
+              <Input
+                data-testid="global-search"
+                aria-label="Search projects and workspaces"
+                placeholder="Search projects and workspaces"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                autoFocus
+              />
+              <kbd>ESC</kbd>
+            </div>
+            <div className="command-results">
+              <span className="app-rail-section">Results</span>
+              {commandResults.length ? commandResults.map((item) => (
+                <button key={`${item.type}-${item.id}`} onClick={() => selectCommandResult(item)}>
+                  <item.icon aria-hidden="true" />
+                  <span>
+                    <strong>{item.label}</strong>
+                    <small>{item.type}</small>
+                  </span>
+                  <ChevronRight aria-hidden="true" />
+                </button>
+              )) : (
+                <p>No matching projects or workspaces.</p>
+              )}
+            </div>
+          </section>
+        </div>
+      )}
 
       <ProjectWizard
         open={showWizard}

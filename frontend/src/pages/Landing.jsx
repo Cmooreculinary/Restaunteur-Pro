@@ -38,13 +38,13 @@ const Landing = ({ setUser }) => {
   const [errors, setErrors] = useState({});
 
   const modules = [
-    { icon: LayoutDashboard, name: "Command Center", desc: "Construction dashboard & project tracking" },
-    { icon: Map, name: "Site Strategist", desc: "Location analysis & demographics" },
-    { icon: Hammer, name: "Ground Up", desc: "Floor plans & permit compliance" },
-    { icon: Rocket, name: "Ops Launchpad", desc: "Hiring, menu & supply chain" },
-    { icon: TrendingUp, name: "Expansion Toolkit", desc: "Multi-unit growth & franchise" },
-    { icon: FileText, name: "Lease Negotiation", desc: "Contract analysis & tracking" },
-    { icon: Megaphone, name: "Marketeer Agent", desc: "AI-powered marketing content & campaigns" },
+    { icon: LayoutDashboard, name: "Command Center", desc: "Decisions, critical work, budgets, and project status." },
+    { icon: Map, name: "Site Strategist", desc: "Location research and operating assumptions in context." },
+    { icon: Hammer, name: "Ground Up", desc: "Build milestones, permits, plans, and approvals." },
+    { icon: Rocket, name: "Ops Launchpad", desc: "Opening tasks, hiring, menu, and supply readiness." },
+    { icon: TrendingUp, name: "Expansion Toolkit", desc: "Compare locations and carry operating knowledge forward." },
+    { icon: FileText, name: "Lease Negotiation", desc: "Terms, risks, documents, and next actions together." },
+    { icon: Megaphone, name: "Marketeer Agent", desc: "Briefs, campaigns, assets, and execution in one workspace." },
   ];
 
   const validate = () => {
@@ -287,12 +287,12 @@ const Landing = ({ setUser }) => {
           <div className="marketing-hero-copy">
             <p className="marketing-eyebrow">Restaurant development + operations</p>
             <h1>
-              Build the restaurant.
-              <span>Run the work.</span>
+              One workspace.
+              <span>Every opening decision.</span>
             </h1>
             <p className="marketing-lede">
-              From concept to multi-unit expansion. The complete platform for restaurateurs
-              to plan, build, launch, and grow successful restaurant ventures.
+              Plan the concept, qualify the site, control the build, prepare the opening,
+              and operate without losing the thread between decisions.
             </p>
             <div className="marketing-hero-actions">
               <Button
@@ -300,7 +300,7 @@ const Landing = ({ setUser }) => {
                 onClick={() => setView("register")}
                 className="marketing-primary"
               >
-                Get Started Free
+                Start a workspace
                 <ArrowRight className="w-5 h-5" />
               </Button>
               <Button
@@ -309,15 +309,15 @@ const Landing = ({ setUser }) => {
                 onClick={() => setView("secret")}
                 className="marketing-secondary"
               >
-                Demo Access
+                Open demo
               </Button>
             </div>
           </div>
           <div className="marketing-hero-index" aria-label="Platform scope">
-            <span>01</span><p>Plan</p>
-            <span>02</span><p>Build</p>
-            <span>03</span><p>Launch</p>
-            <span>04</span><p>Operate</p>
+            <span>01</span><p>Concept</p>
+            <span>02</span><p>Site</p>
+            <span>03</span><p>Opening</p>
+            <span>04</span><p>Operations</p>
           </div>
         </div>
       </div>
@@ -326,10 +326,10 @@ const Landing = ({ setUser }) => {
         <div className="marketing-section-head">
           <div>
             <p className="marketing-eyebrow">The operating system</p>
-            <h2>Seven modules. One restaurant journey.</h2>
+            <h2>Linked work. One operating record.</h2>
           </div>
           <p>
-              Everything you need to take your restaurant from idea to thriving business
+              Move between disciplines without breaking project context.
           </p>
         </div>
           <div className="marketing-module-list">
@@ -350,8 +350,8 @@ const Landing = ({ setUser }) => {
       </section>
 
       <section className="marketing-cta">
-          <p className="marketing-eyebrow">Your next service starts here</p>
-          <h2>Ready to build your restaurant?</h2>
+          <p className="marketing-eyebrow">The next decision is waiting</p>
+          <h2>Open the restaurant workspace.</h2>
           <p>
             Put the concept, site, build, opening plan, and operating intelligence in one disciplined workspace.
           </p>
@@ -360,7 +360,7 @@ const Landing = ({ setUser }) => {
             onClick={() => setView("register")}
             className="marketing-primary"
           >
-            Start Your Journey
+            Start a workspace
             <ArrowRight className="w-5 h-5" />
           </Button>
       </section>
