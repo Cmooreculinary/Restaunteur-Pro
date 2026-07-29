@@ -1,8 +1,9 @@
+import os
 import requests
 import json
 
 def test_simple():
-    base_url = "https://live-support-hub-1.preview.emergentagent.com/api"
+    base_url = os.environ.get("BACKEND_URL", "http://localhost:8000") + "/api"
     
     print("Testing basic endpoints...")
     

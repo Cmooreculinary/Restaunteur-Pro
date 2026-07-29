@@ -1,10 +1,11 @@
+import os
 import requests
 import sys
 import json
 from datetime import datetime
 
 class RestaurateurProAPITester:
-    def __init__(self, base_url="https://live-support-hub-1.preview.emergentagent.com/api"):
+    def __init__(self, base_url=os.environ.get("BACKEND_URL", "http://localhost:8000") + "/api"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
